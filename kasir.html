@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Kasir Mie Judes</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background: #2c3e50; padding: 20px; color: white; }
+        .card { color: #333; border-radius: 15px; }
+        .list-group-item { color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card p-4 shadow mb-4">
+            <h3 class="text-center font-weight-bold">KASIR MIE JUDES</h3>
+            <form id="formTransaksi">
+                <input type="hidden" name="action" value="updateTransaksi">
+                <div class="form-group"><label>No WhatsApp Member</label><input type="tel" name="hp" class="form-control" required></div>
+                <div class="form-group"><label>Nominal Belanja (Rp)</label><input type="number" name="nominal" class="form-control" required></div>
+                <button type="submit" class="btn btn-success btn-block btn-lg">INPUT TRANSAKSI</button>
+            </form>
+        </div>
+
+        <div id="result" class="card p-3 mb-4 text-center" style="display:none;">
+            <h4 class="text-success font-weight-bold">SUKSES!</h4>
+            <p id="resDetail"></p>
+            <a id="btnWA" href="#" target="_blank" class="btn btn-primary btn-block">KIRIM STRUK KE WA</a>
+        </div>
+
+        <h5 class="text-warning">🔔 PENGINGAT HARI INI</h5>
+        <div id="reminderList" class="list-group shadow-sm"></div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxjxViMtbQSaD30Qt1GHaKS0wxanC92OBFqPGzVhiqws1GyhbwsFXS2LQBcKC1JlTMJ/exec';
+        
+        // Ambil Reminder Otomatis
+        window.onload = () => {
+            fetch(scriptURL + "?action=getReminders")
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById('reminderList');
+                if(data.length === 0) list.innerHTML = "<div class='alert alert-light'>Tidak ada pengingat.</div>";
+                data.forEach(item => {
+                    let link = "https://wa.me/" + item.wa + "?text=" + encodeURIComponent(item.pesan);
+                    list.innerHTML += `<div class='list-group-item d-flex justify-content-between align-items-center'>
+                        <div><b>${item.tipe}</b><br>${item.nama}</div>
+                        <a href="${link}" target="_blank" class="btn btn-sm btn-info">Sapa WA</a>
+                    </div>`;
+                });
+            });
+        };
+
+        // Form Transaksi
+        document.getElementById('formTransaksi').addEventListener('submit', e => {
+            e.preventDefault();
+            fetch(scriptURL, { method: 'POST', body: new FormData(e.target)})
+            .then(res => res.json())
+            .then(res => {
+                if(res.success){
+                    document.getElementById('result').style.display = 'block';
+                    document.getElementById('resDetail').innerText = "Member: "+res.nama+" | Total Poin: "+res.totalPoin;
+                    document.getElementById('btnWA').href = "https://wa.me/"+res.wa+"?text="+encodeURIComponent(res.pesan);
+                } else { alert(res.message); }
+            });
+        });
+    </script>
+</body>
+</html>
