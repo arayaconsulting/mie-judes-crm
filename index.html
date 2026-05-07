@@ -14,26 +14,25 @@
         .card-form { background: #fff; border-radius: 25px; color: #333; overflow: hidden; border: none; }
         .form-header { background: #d32f2f; padding: 30px 20px; text-align: center; color: #fff; }
         
-        /* Logo Circle - Background Hitam */
         .logo-container { width: 100px; height: 100px; background: #000; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); overflow: hidden; border: 3px solid #fff; padding: 8px; }
         .logo-img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
         .btn-submit { background: #d32f2f; color: #fff; border-radius: 12px; font-weight: 800; padding: 15px; border: none; width: 100%; transition: 0.3s; }
-        .btn-submit:hover { background: #b71c1c; transform: translateY(-2px); }
-
+        
         #voucherSection { display: none; animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .voucher-box { background: #fff; border-radius: 20px; color: #333; position: relative; padding: 0; overflow: hidden; border: none; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
-        .v-top { background: #d32f2f; color: #fff; padding: 25px; text-align: center; border-bottom: 3px dashed rgba(255,255,255,0.4); }
-        .v-body { padding: 30px; text-align: center; position: relative; }
-        .v-kode { font-size: 38px; font-weight: 800; color: #d32f2f; border: 3px dashed #d32f2f; padding: 10px; display: inline-block; margin: 10px 0 30px 0; background: #fff5f5; width: 100%; letter-spacing: 2px; border-radius: 10px; }
+        .voucher-box { background: #fff; border-radius: 20px; color: #333; position: relative; padding: 0; overflow: hidden; border: none; }
+        .v-top { background: #d32f2f; color: #fff; padding: 25px; text-align: center; }
+        .v-body { padding: 20px 30px 30px 30px; text-align: center; position: relative; }
         
-        /* Notch / Sobekan */
-        .v-cut { height: 40px; background: #1a1a1a; width: 40px; border-radius: 50%; position: absolute; top: 225px; z-index: 10; }
+        .v-kode { font-size: 38px; font-weight: 800; color: #d32f2f; border: 3px dashed #d32f2f; padding: 10px; display: inline-block; margin: 10px 0 25px 0; background: #fff5f5; width: 100%; letter-spacing: 2px; border-radius: 10px; }
+        
+        /* POSISI SOBEKAN BARU: Tepat di bawah kode voucher */
+        .v-cut { height: 40px; background: #1a1a1a; width: 40px; border-radius: 50%; position: absolute; top: 220px; z-index: 10; }
         .cut-left { left: -20px; } .cut-right { right: -20px; }
         
-        .v-promo { text-align: left; background: #fdf2f2; padding: 15px; border-radius: 12px; font-size: 14px; line-height: 1.6; border: 1px solid #ffcccc; }
+        .v-promo { text-align: left; background: #fdf2f2; padding: 15px; border-radius: 12px; font-size: 14px; line-height: 1.6; border: 1px solid #ffcccc; margin-top: 10px; }
         .btn-download { background: #27ae60; color: #fff; border-radius: 12px; font-weight: 700; padding: 15px; width: 100%; border: none; margin-top: 20px; }
         .spinner { display: none; width: 25px; height: 25px; border: 3px solid #fff; border-radius: 50%; border-top-color: transparent; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -43,9 +42,9 @@
 
 <div class="main-container">
     <div id="formSection" class="card-form shadow-lg">
-        <div class="form-header shadow-sm">
+        <div class="form-header">
             <div class="logo-container">
-                <img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img" alt="Logo Mie Judes">
+                <img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img" alt="Logo">
             </div>
             <h2 class="font-weight-bold mb-0">MIE JUDES</h2>
             <p class="small mb-0">Grand Opening Special Access</p>
@@ -53,24 +52,12 @@
         <div class="p-4">
             <form id="formDaftar">
                 <input type="hidden" name="action" value="register">
-                <div class="form-group">
-                    <label class="small font-weight-bold text-muted text-uppercase">Nama Lengkap</label>
-                    <input type="text" name="nama" class="form-control form-control-lg" style="border-radius: 10px;" placeholder="Masukkan Nama" required>
-                </div>
-                <div class="form-group">
-                    <label class="small font-weight-bold text-muted text-uppercase">Nomor WhatsApp</label>
-                    <input type="tel" name="hp" class="form-control form-control-lg" style="border-radius: 10px;" placeholder="08xxxxxxxx" required>
-                </div>
-                <div class="form-group">
-                    <label class="small font-weight-bold text-muted text-uppercase">Tanggal Lahir</label>
-                    <input type="date" name="tgl_lahir" class="form-control form-control-lg" style="border-radius: 10px;" required>
-                </div>
-                <div class="form-group">
-                    <label class="small font-weight-bold text-muted text-uppercase">Pekerjaan</label>
-                    <input type="text" name="pekerjaan" class="form-control form-control-lg" style="border-radius: 10px;" placeholder="Contoh: Mahasiswa / Karyawan" required>
-                </div>
-                <button type="submit" id="btnSubmit" class="btn-submit mt-3 shadow">
-                    <span id="btnText">AMBIL VOUCHER SEKARANG</span>
+                <div class="form-group"><label class="small font-weight-bold">NAMA LENGKAP</label><input type="text" name="nama" class="form-control" required></div>
+                <div class="form-group"><label class="small font-weight-bold">NOMOR WHATSAPP</label><input type="tel" name="hp" class="form-control" required></div>
+                <div class="form-group"><label class="small font-weight-bold">TANGGAL LAHIR</label><input type="date" name="tgl_lahir" class="form-control" required></div>
+                <div class="form-group"><label class="small font-weight-bold">PEKERJAAN</label><input type="text" name="pekerjaan" class="form-control" required></div>
+                <button type="submit" id="btnSubmit" class="btn-submit">
+                    <span id="btnText">AMBIL VOUCHER</span>
                     <div id="spinner" class="spinner"></div>
                 </button>
             </form>
@@ -87,62 +74,70 @@
                 <p class="small mb-0">Mie Judes Lamongan</p>
             </div>
             <div class="v-body">
-                <p class="mb-1 text-muted">Selamat, <b id="resNama" class="text-dark"></b>!</p>
+                <p class="mb-1 text-muted small">Selamat, <b id="resNama" class="text-dark"></b>!</p>
                 <div class="v-kode" id="resKode"></div>
                 
                 <div class="v-cut cut-left"></div>
                 <div class="v-cut cut-right"></div>
 
-                <div class="v-promo shadow-sm mb-3">
+                <div class="v-promo">
                     <b class="text-danger">JADWAL PROMO:</b><br>
                     🎁 20 Mei: Gratis Es Teh<br>
                     🎁 21 Mei: Buy 1 Get 1 (Judes/Kentir)<br>
                     🎁 22 Mei: Beli Mie Kuah Free Mie Cerewet<br>
                     🎁 23 Mei: Min 70rb Free Dimsum
                 </div>
-                <p class="text-danger font-weight-bold" style="font-size: 14px; line-height: 1.4;">
-                    VOUCHER BERLAKU DI SELURUH TANGGAL PROMO DI ATAS
-                </p>
+                <p class="text-danger font-weight-bold mt-3" style="font-size: 13px;">VOUCHER BERLAKU DI SELURUH TANGGAL PROMO DI ATAS</p>
             </div>
         </div>
-        <button onclick="downloadVoucher()" class="btn-download shadow">📥 SIMPAN KE GALERI</button>
+        <button id="btnDownload" onclick="downloadVoucher()" class="btn-download shadow">📥 SIMPAN VOUCHER</button>
+        <p class="text-center mt-3 small text-white-50">Jika tombol tidak jalan, tekan lama pada voucher lalu "Simpan Gambar".</p>
     </div>
 </div>
 
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxjxViMtbQSaD30Qt1GHaKS0wxanC92OBFqPGzVhiqws1GyhbwsFXS2LQBcKC1JlTMJ/exec';
-    const form = document.getElementById('formDaftar');
-
-    form.addEventListener('submit', e => {
+    
+    document.getElementById('formDaftar').addEventListener('submit', e => {
         e.preventDefault();
         document.getElementById('btnText').style.display = 'none';
         document.getElementById('spinner').style.display = 'block';
-        document.getElementById('btnSubmit').disabled = true;
-
-        fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+        fetch(scriptURL, { method: 'POST', body: new FormData(e.target)})
         .then(res => res.json())
         .then(res => {
             document.getElementById('formSection').style.display = 'none';
             document.getElementById('voucherSection').style.display = 'block';
             document.getElementById('resNama').innerText = res.nama.toUpperCase();
             document.getElementById('resKode').innerText = res.kode;
-            window.scrollTo(0, 0);
-        })
-        .catch(err => {
-            alert('Gangguan koneksi. Coba lagi!');
-            document.getElementById('btnText').style.display = 'block';
-            document.getElementById('spinner').style.display = 'none';
-            document.getElementById('btnSubmit').disabled = false;
+            window.scrollTo(0,0);
         });
     });
 
     function downloadVoucher() {
+        const btn = document.getElementById('btnDownload');
+        btn.innerText = "Sedang Memproses...";
         const area = document.getElementById('captureArea');
-        html2canvas(area, { scale: 3, useCORS: true }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'Voucher-Mie-Judes.png';
-            link.href = canvas.toDataURL("image/png");
-            link.click();
+        
+        html2canvas(area, { scale: 3, useCORS: true, allowTaint: true }).then(canvas => {
+            const imageData = canvas.toDataURL("image/png");
+            
+            // Logika Deteksi iPhone/iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            if (isIOS) {
+                // Di iPhone, kita buka gambar di tab baru agar user bisa "Hold & Save"
+                const newTab = window.open();
+                newTab.document.write('<img src="' + imageData + '" style="width:100%;">');
+                newTab.document.write('<p style="text-align:center; font-family:sans-serif;">Tekan lama gambar, lalu pilih "Simpan Gambar"</p>');
+                btn.innerText = "📥 SIMPAN VOUCHER";
+            } else {
+                // Di Android/PC tetap download otomatis
+                const link = document.createElement('a');
+                link.download = 'Voucher-Mie-Judes.png';
+                link.href = imageData;
+                link.click();
+                btn.innerText = "📥 SIMPAN VOUCHER";
+            }
         });
     }
 </script>
