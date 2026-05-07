@@ -1,145 +1,112 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mie Judes - Member & Voucher</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #1a1a1a; color: #fff; }
-        .main-container { max-width: 450px; margin: auto; padding: 20px; }
-        .card-form { background: #fff; border-radius: 25px; color: #333; overflow: hidden; border: none; }
-        .form-header { background: #d32f2f; padding: 30px 20px; text-align: center; color: #fff; }
-        
-        .logo-container { width: 100px; height: 100px; background: #000; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); overflow: hidden; border: 3px solid #fff; padding: 8px; }
-        .logo-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        .btn-submit { background: #d32f2f; color: #fff; border-radius: 12px; font-weight: 800; padding: 15px; border: none; width: 100%; transition: 0.3s; }
-        
-        #voucherSection { display: none; animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+function doGet(e) {
+  if (e.parameter.action == 'getReminders') {
+    return ContentService.createTextOutput(JSON.stringify(getReminders())).setMimeType(ContentService.MimeType.JSON);
+  }
+  return HtmlService.createHtmlOutputFromFile('index');
+}
 
-        .voucher-box { background: #fff; border-radius: 20px; color: #333; position: relative; padding: 0; overflow: hidden; border: none; }
-        .v-top { background: #d32f2f; color: #fff; padding: 25px; text-align: center; }
-        .v-body { padding: 20px 30px 30px 30px; text-align: center; position: relative; }
-        
-        .v-kode { font-size: 38px; font-weight: 800; color: #d32f2f; border: 3px dashed #d32f2f; padding: 10px; display: inline-block; margin: 10px 0 25px 0; background: #fff5f5; width: 100%; letter-spacing: 2px; border-radius: 10px; }
-        
-        /* POSISI SOBEKAN BARU: Tepat di bawah kode voucher */
-        .v-cut { height: 40px; background: #1a1a1a; width: 40px; border-radius: 50%; position: absolute; top: 220px; z-index: 10; }
-        .cut-left { left: -20px; } .cut-right { right: -20px; }
-        
-        .v-promo { text-align: left; background: #fdf2f2; padding: 15px; border-radius: 12px; font-size: 14px; line-height: 1.6; border: 1px solid #ffcccc; margin-top: 10px; }
-        .btn-download { background: #27ae60; color: #fff; border-radius: 12px; font-weight: 700; padding: 15px; width: 100%; border: none; margin-top: 20px; }
-        .spinner { display: none; width: 25px; height: 25px; border: 3px solid #fff; border-radius: 50%; border-top-color: transparent; animation: spin 0.8s linear infinite; margin: 0 auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
-</head>
-<body>
+function doPost(e) {
+  var action = e.parameter.action;
+  if (action == 'updateTransaksi') {
+    return ContentService.createTextOutput(JSON.stringify(updateTransaksi(e.parameter))).setMimeType(ContentService.MimeType.JSON);
+  } else if (action == 'claimVoucher') {
+    return ContentService.createTextOutput(JSON.stringify(claimVoucher(e.parameter))).setMimeType(ContentService.MimeType.JSON);
+  } else {
+    return ContentService.createTextOutput(JSON.stringify(processForm(e.parameter))).setMimeType(ContentService.MimeType.JSON);
+  }
+}
 
-<div class="main-container">
-    <div id="formSection" class="card-form shadow-lg">
-        <div class="form-header">
-            <div class="logo-container">
-                <img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img" alt="Logo">
-            </div>
-            <h2 class="font-weight-bold mb-0">MIE JUDES</h2>
-            <p class="small mb-0">Grand Opening Special Access</p>
-        </div>
-        <div class="p-4">
-            <form id="formDaftar">
-                <input type="hidden" name="action" value="register">
-                <div class="form-group"><label class="small font-weight-bold">NAMA LENGKAP</label><input type="text" name="nama" class="form-control" required></div>
-                <div class="form-group"><label class="small font-weight-bold">NOMOR WHATSAPP</label><input type="tel" name="hp" class="form-control" required></div>
-                <div class="form-group"><label class="small font-weight-bold">TANGGAL LAHIR</label><input type="date" name="tgl_lahir" class="form-control" required></div>
-                <div class="form-group"><label class="small font-weight-bold">PEKERJAAN</label><input type="text" name="pekerjaan" class="form-control" required></div>
-                <button type="submit" id="btnSubmit" class="btn-submit">
-                    <span id="btnText">AMBIL VOUCHER</span>
-                    <div id="spinner" class="spinner"></div>
-                </button>
-            </form>
-        </div>
-    </div>
+// 1. FUNGSI PENDAFTARAN MEMBER BARU
+function processForm(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var kode = "MJ-" + Math.random().toString(36).substr(2, 4).toUpperCase();
+  sheet.appendRow([new Date(), data.nama.toUpperCase(), "'" + data.hp, data.tgl_lahir, data.pekerjaan, kode, 0, new Date()]);
+  return { nama: data.nama, kode: kode };
+}
 
-    <div id="voucherSection">
-        <div id="captureArea" class="voucher-box">
-            <div class="v-top">
-                <div class="logo-container" style="width: 70px; height: 70px; border: 2px solid #fff; margin-bottom: 10px;">
-                    <img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img" alt="Logo">
-                </div>
-                <h5 class="font-weight-bold mb-0">EXCLUSIVE VOUCHER</h5>
-                <p class="small mb-0">Mie Judes Lamongan</p>
-            </div>
-            <div class="v-body">
-                <p class="mb-1 text-muted small">Selamat, <b id="resNama" class="text-dark"></b>!</p>
-                <div class="v-kode" id="resKode"></div>
-                
-                <div class="v-cut cut-left"></div>
-                <div class="v-cut cut-right"></div>
-
-                <div class="v-promo">
-                    <b class="text-danger">JADWAL PROMO:</b><br>
-                    🎁 20 Mei: Gratis Es Teh<br>
-                    🎁 21 Mei: Buy 1 Get 1 (Judes/Kentir)<br>
-                    🎁 22 Mei: Beli Mie Kuah Free Mie Cerewet<br>
-                    🎁 23 Mei: Min 70rb Free Dimsum
-                </div>
-                <p class="text-danger font-weight-bold mt-3" style="font-size: 13px;">VOUCHER BERLAKU DI SELURUH TANGGAL PROMO DI ATAS</p>
-            </div>
-        </div>
-        <button id="btnDownload" onclick="downloadVoucher()" class="btn-download shadow">📥 SIMPAN VOUCHER</button>
-        <p class="text-center mt-3 small text-white-50">Jika tombol tidak jalan, tekan lama pada voucher lalu "Simpan Gambar".</p>
-    </div>
-</div>
-
-<script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxjxViMtbQSaD30Qt1GHaKS0wxanC92OBFqPGzVhiqws1GyhbwsFXS2LQBcKC1JlTMJ/exec';
-    
-    document.getElementById('formDaftar').addEventListener('submit', e => {
-        e.preventDefault();
-        document.getElementById('btnText').style.display = 'none';
-        document.getElementById('spinner').style.display = 'block';
-        fetch(scriptURL, { method: 'POST', body: new FormData(e.target)})
-        .then(res => res.json())
-        .then(res => {
-            document.getElementById('formSection').style.display = 'none';
-            document.getElementById('voucherSection').style.display = 'block';
-            document.getElementById('resNama').innerText = res.nama.toUpperCase();
-            document.getElementById('resKode').innerText = res.kode;
-            window.scrollTo(0,0);
-        });
-    });
-
-    function downloadVoucher() {
-        const btn = document.getElementById('btnDownload');
-        btn.innerText = "Sedang Memproses...";
-        const area = document.getElementById('captureArea');
-        
-        html2canvas(area, { scale: 3, useCORS: true, allowTaint: true }).then(canvas => {
-            const imageData = canvas.toDataURL("image/png");
-            
-            // Logika Deteksi iPhone/iOS
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            
-            if (isIOS) {
-                // Di iPhone, kita buka gambar di tab baru agar user bisa "Hold & Save"
-                const newTab = window.open();
-                newTab.document.write('<img src="' + imageData + '" style="width:100%;">');
-                newTab.document.write('<p style="text-align:center; font-family:sans-serif;">Tekan lama gambar, lalu pilih "Simpan Gambar"</p>');
-                btn.innerText = "📥 SIMPAN VOUCHER";
-            } else {
-                // Di Android/PC tetap download otomatis
-                const link = document.createElement('a');
-                link.download = 'Voucher-Mie-Judes.png';
-                link.href = imageData;
-                link.click();
-                btn.innerText = "📥 SIMPAN VOUCHER";
-            }
-        });
+// 2. FUNGSI UPDATE POIN TRANSAKSI
+function updateTransaksi(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var values = sheet.getDataRange().getValues();
+  var noHP = data.hp;
+  var nominal = parseFloat(data.nominal);
+  var poinBaru = Math.floor(nominal / 10000); 
+  
+  for (var i = 1; i < values.length; i++) {
+    if (values[i][2] == noHP) {
+      var poinLama = Number(values[i][6]) || 0; 
+      var totalPoin = poinLama + poinBaru;
+      sheet.getRange(i + 1, 7).setValue(totalPoin); 
+      sheet.getRange(i + 1, 8).setValue(new Date()); 
+      var pesanWA = "*KONFIRMASI POIN MIE JUDES*\n━━━━━━━━━━━━━━━\nTerima kasih Kak *" + values[i][1] + "*, sudah berkunjung hari ini! 🙏\n\n📝 *DETAIL TRANSAKSI:*\n• Total Belanja: Rp " + nominal.toLocaleString('id-ID') + "\n• Perolehan: +" + poinBaru + " Poin\n\n💰 *SALDO POIN AKHIR: " + totalPoin + " POIN*\n━━━━━━━━━━━━━━━\n\n🎁 *PROGRAM PENUKARAN POIN:* \n🔹 15 Poin : Es Teh Manis 🥤\n🔹 20 Poin : Snack Sosis 🌭\n🔹 25 Poin : Dimsum Special 🥟\n🔹 30 Poin : Mie Kentir / Mie Judes 🍜\n\nKumpulkan terus poinnya! 🔥";
+      return { success: true, nama: values[i][1], wa: noHP, pesan: pesanWA, totalPoin: totalPoin };
     }
-</script>
-</body>
-</html>
+  }
+  return { success: false, message: "Nomor Member tidak terdaftar!" };
+}
+
+// 3. FUNGSI CEK VOUCHER
+function claimVoucher(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var values = sheet.getDataRange().getValues();
+  var kodeInput = data.kode_voucher.toUpperCase().trim();
+  for (var i = 1; i < values.length; i++) {
+    if (values[i][5] == kodeInput) {
+      return { success: true, nama: values[i][1], wa: values[i][2], pekerjaan: values[i][4], poin: values[i][6], message: "KODE VALID!" };
+    }
+  }
+  return { success: false, message: "KODE TIDAK DITEMUKAN!" };
+}
+
+// 4. FUNGSI PENGINGAT (H-1 & HARI H ULTAH + RETENSI 10 HARI)
+function getReminders() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var data = sheet.getDataRange().getValues();
+  var today = new Date();
+  
+  // Variabel Besok
+  var besok = new Date();
+  besok.setDate(today.getDate() + 1);
+  
+  var reminders = [];
+  for (var i = 1; i < data.length; i++) {
+    var nama = data[i][1];
+    var wa = data[i][2];
+    var tglLahir = new Date(data[i][3]);
+    var tglKunjungan = new Date(data[i][7]);
+    var saldoPoin = data[i][6];
+
+    // CEK HARI H ULANG TAHUN
+    if (tglLahir.getDate() == today.getDate() && tglLahir.getMonth() == today.getMonth()) {
+      reminders.push({
+        tipe: "ULTAH HARI INI! 🎉",
+        nama: nama, wa: wa,
+        pesan: "*SELAMAT ULANG TAHUN KAK " + nama + "!* 🎂🥳 Spesial di hari bahagia ini, Kakak dapat HADIAH MIE GRATIS dari Mie Judes. Yuk mampir hari ini dan tunjukkan pesan ini ke kasir!"
+      });
+    }
+
+    // CEK H-1 ULANG TAHUN
+    else if (tglLahir.getDate() == besok.getDate() && tglLahir.getMonth() == besok.getMonth()) {
+      reminders.push({
+        tipe: "ULTAH BESOK! 🎁",
+        nama: nama, wa: wa,
+        pesan: "Halo Kak " + nama + ", besok Kakak ulang tahun ya? 😍 Persiapan yuk! Spesial buat besok, ada kado Mie Gratis dari Mie Judes buat Kakak. Sampai jumpa besok ya!"
+      });
+    }
+
+    // CEK 10 HARI TIDAK DATANG
+    var selisihHari = Math.floor((today - tglKunjungan) / (1000 * 60 * 60 * 24));
+    if (selisihHari >= 10) {
+      reminders.push({
+        tipe: "KANGEN (10 HARI) 🍜",
+        nama: nama, wa: wa,
+        pesan: "Halo Kak " + nama + ", sudah 10 hari nih nggak ketemu di Mie Judes. Saldo poin Kakak masih ada " + saldoPoin + " lho. Mampir jajan mie pedas favorit hari ini yuk!"
+      });
+    }
+  }
+  return reminders;
+}
