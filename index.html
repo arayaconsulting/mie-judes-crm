@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Mie Judes - Grand Opening</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background: #f4f4f4; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { border-top: 8px solid #d32f2f; border-radius: 15px; max-width: 500px; margin: auto; overflow: hidden; }
+        .btn-judes { background: #d32f2f; color: white; font-weight: bold; padding: 12px; transition: 0.3s; }
+        .btn-judes:hover { background: #b71c1c; color: white; transform: translateY(-2px); }
+        #voucherSection { display: none; }
+        .kode-unik { font-size: 32px; font-weight: bold; color: #d32f2f; border: 2px dashed #d32f2f; padding: 15px; background: #fff5f5; display: inline-block; width: 100%; }
+        .promo-item { border-left: 3px solid #d32f2f; padding-left: 10px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SEKSI FORM PENDAFTARAN -->
+        <div id="formSection" class="card shadow-lg p-4">
+            <h2 class="text-center text-danger font-weight-bold">MIE JUDES</h2>
+            <p class="text-center text-muted">Daftar Member & Voucher Promo Grand Opening</p>
+            <hr>
+            <form id="formDaftar">
+                <!-- Penanda Action untuk Apps Script -->
+                <input type="hidden" name="action" value="register">
+                
+                <div class="form-group">
+                    <label class="font-weight-bold">Nama Lengkap</label>
+                    <input type="text" name="nama" class="form-control" placeholder="Masukkan nama sesuai KTP" required>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Nomor WhatsApp</label>
+                    <input type="tel" name="hp" class="form-control" placeholder="Contoh: 08123456789" required>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Tanggal Lahir</label>
+                    <input type="date" name="tgl_lahir" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold">Alamat (Kecamatan)</label>
+                    <input type="text" name="alamat" class="form-control" placeholder="Contoh: Veteran / Lamongan Kota" required>
+                </div>
+                <button type="submit" class="btn btn-judes btn-block shadow-sm">AMBIL VOUCHER SEKARANG</button>
+            </form>
+        </div>
+
+        <!-- SEKSI TAMPILAN VOUCHER (MUNCUL SETELAH SUBMIT) -->
+        <div id="voucherSection" class="card shadow-lg p-4 text-center">
+            <h4 class="font-weight-bold text-success">BERHASIL TERDAFTAR!</h4>
+            <p class="mb-1">Halo, <span id="resNama" class="font-weight-bold text-uppercase"></span></p>
+            <p class="text-muted">Ini adalah Kode Voucher Eksklusif Anda:</p>
+            
+            <div id="resKode" class="kode-unik my-3 shadow-sm"></div>
+            
+            <div class="alert alert-warning text-left shadow-sm">
+                <b class="d-block mb-2 text-center">JADWAL PROMO GRAND OPENING:</b>
+                <div class="promo-item"><b>20 Mei:</b> Gratis Es Teh</div>
+                <div class="promo-item"><b>21 Mei:</b> Buy 1 Get 1 (Judes/Kentir)</div>
+                <div class="promo-item"><b>22 Mei:</b> Beli Mie Kuah Free Mie Cerewet</div>
+                <div class="promo-item"><b>23 Mei:</b> Min 70rb Free Dimsum</div>
+            </div>
+            
+            <p class="text-danger font-weight-bold mb-0">⚠️ PENTING: SCREENSHOT HALAMAN INI!</p>
+            <small class="text-muted">Tunjukkan screenshot ini ke kasir untuk klaim promo.</small>
+        </div>
+    </div>
+
+    <script>
+        // URL Apps Script terbaru Anda
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxjxViMtbQSaD30Qt1GHaKS0wxanC92OBFqPGzVhiqws1GyhbwsFXS2LQBcKC1JlTMJ/exec';
+        const form = document.getElementById('formDaftar');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            
+            // Animasi Loading pada Tombol
+            const submitBtn = form.querySelector('button');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses Data...`;
+
+            // Kirim Data menggunakan Fetch API
+            fetch(scriptURL, { 
+                method: 'POST', 
+                body: new FormData(form)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(res => {
+                // Sembunyikan Form, Tampilkan Voucher
+                document.getElementById('formSection').style.display = 'none';
+                document.getElementById('voucherSection').style.display = 'block';
+                
+                // Isi data dinamis
+                document.getElementById('resNama').innerText = res.nama;
+                document.getElementById('resKode').innerText = res.kode;
+                
+                // Scroll ke atas agar voucher terlihat jelas
+                window.scrollTo(0, 0);
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                alert('Terjadi kesalahan teknis. Pastikan internet stabil dan coba lagi.');
+                submitBtn.disabled = false;
+                submitBtn.innerText = "AMBIL VOUCHER SEKARANG";
+            });
+        });
+    </script>
+</body>
+</html>
