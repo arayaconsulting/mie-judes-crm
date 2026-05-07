@@ -151,7 +151,6 @@
 
     function downloadVoucher() {
         const area = document.getElementById('captureArea');
-        // Resolusi tinggi untuk download
         html2canvas(area, { scale: 3 }).then(canvas => {
             const link = document.createElement('a');
             link.download = 'Voucher-Mie-Judes.png';
