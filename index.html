@@ -11,36 +11,29 @@
         body { font-family: 'Montserrat', sans-serif; background-color: #1a1a1a; color: #fff; }
         .main-container { max-width: 450px; margin: auto; padding: 20px; }
         
-        /* FORM SECTION */
         .card-form { background: #fff; border-radius: 25px; color: #333; overflow: hidden; border: none; }
         .form-header { background: #d32f2f; padding: 30px 20px; text-align: center; color: #fff; }
         .logo-container { width: 90px; height: 90px; background: #000; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); border: 3px solid #fff; padding: 5px; overflow: hidden; }
         .logo-img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .btn-submit { background: #d32f2f; color: #fff; border-radius: 12px; font-weight: 800; padding: 15px; border: none; width: 100%; transition: 0.3s; }
         
-        /* CHECKBOX PROMO */
         .promo-choice { background: #f8f9fa; border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.3s; display: block; font-size: 13px; font-weight: 600; color: #555; }
         .promo-choice input { margin-right: 12px; transform: scale(1.2); }
-        .promo-choice:hover { background: #fff1f1; border-color: #d32f2f; color: #d32f2f; }
 
-        /* VOUCHER SECTION (Hidden, used for capture) */
         #voucherSection { position: fixed; left: -9999px; top: 0; }
-        .voucher-box { background: #fff; width: 400px; color: #333; overflow: hidden; border-radius: 20px; }
+        .voucher-box { background: #fff; width: 400px; color: #333; overflow: hidden; border-radius: 20px; position: relative; }
         .v-top { background: #d32f2f; color: #fff; padding: 20px; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.4); }
         .v-body { padding: 25px; text-align: center; position: relative; }
-        .v-kode { font-size: 35px; font-weight: 800; color: #d32f2f; border: 3px dashed #d32f2f; padding: 10px; display: inline-block; margin: 10px 0 20px 0; width: 100%; background: #fff5f5; border-radius: 10px; letter-spacing: 2px; }
+        .v-kode { font-size: 35px; font-weight: 800; color: #d32f2f; border: 3px dashed #d32f2f; padding: 10px; display: inline-block; margin: 5px 0 15px 0; width: 100%; background: #fff5f5; border-radius: 10px; letter-spacing: 2px; }
         
-        /* POSISI SOBEKAN FINAL: Pas di garisdashed */
-        .v-cut { height: 36px; background: #1a1a1a; width: 36px; border-radius: 50%; position: absolute; top: 218px; z-index: 10; }
-        .cut-left { left: -18px; } .cut-right { right: -18px; }
+        /* PERBAIKAN FINAL SOBEKAN: Mengurangi top agar naik ke atas */
+        .v-cut { height: 34px; background: #1a1a1a; width: 34px; border-radius: 50%; position: absolute; top: 206px; z-index: 10; }
+        .cut-left { left: -17px; } .cut-right { right: -17px; }
         
-        .v-promo-list { text-align: left; background: #fdf2f2; padding: 12px; border-radius: 10px; font-size: 13px; border: 1px solid #ffcccc; margin-top: 10px; }
+        .v-promo-list { text-align: left; background: #fdf2f2; padding: 12px; border-radius: 10px; font-size: 13px; border: 1px solid #ffcccc; margin-top: 5px; }
 
-        /* FINAL IMAGE SECTION */
         #finalImageContainer { display: none; text-align: center; }
         #finalImage { max-width: 100%; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); border: 1px solid #444; }
-        .spinner { display: none; width: 25px; height: 25px; border: 3px solid #fff; border-radius: 50%; border-top-color: transparent; animation: spin 0.8s linear infinite; margin: 0 auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -48,11 +41,9 @@
 <div class="main-container">
     <div id="formSection" class="card-form shadow-lg">
         <div class="form-header">
-            <div class="logo-container">
-                <img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img" alt="Logo">
-            </div>
+            <div class="logo-container"><img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img"></div>
             <h3 class="font-weight-bold mb-0">MIE JUDES</h3>
-            <p class="small mb-0">Grand Opening Registration</p>
+            <p class="small mb-0 text-uppercase">Member Registration</p>
         </div>
         <div class="p-4">
             <form id="formDaftar">
@@ -60,19 +51,19 @@
                 <div class="form-group"><label class="small font-weight-bold">NAMA LENGKAP</label><input type="text" name="nama" class="form-control" placeholder="Nama Anda" required></div>
                 <div class="form-group"><label class="small font-weight-bold">WHATSAPP</label><input type="tel" name="hp" class="form-control" placeholder="08xxxxxxxx" required></div>
                 <div class="form-group"><label class="small font-weight-bold">TANGGAL LAHIR</label><input type="date" name="tgl_lahir" class="form-control" required></div>
-                <div class="form-group"><label class="small font-weight-bold">PEKERJAAN</label><input type="text" name="pekerjaan" class="form-control" placeholder="Pekerjaan" required></div>
+                <div class="form-group"><label class="small font-weight-bold">PEKERJAAN</label><input type="text" name="pekerjaan" class="form-control" required></div>
                 
-                <div class="form-group mt-4">
-                    <label class="small font-weight-bold text-danger">RENCANA KEDATANGAN (PILIH BEBAS)</label>
+                <div class="form-group mt-3">
+                    <label class="small font-weight-bold text-danger">RENCANA KEDATANGAN</label>
                     <label class="promo-choice"><input type="checkbox" name="p20" value="YA"> 20 Mei: Gratis Es Teh 🥤</label>
                     <label class="promo-choice"><input type="checkbox" name="p21" value="YA"> 21 Mei: Buy 1 Get 1 🍜</label>
                     <label class="promo-choice"><input type="checkbox" name="p22" value="YA"> 22 Mei: Free Mie Cerewet 🍝</label>
                     <label class="promo-choice"><input type="checkbox" name="p23" value="YA"> 23 Mei: Min 70rb Free Dimsum 🥟</label>
                 </div>
 
-                <button type="submit" id="btnSubmit" class="btn-submit mt-2">
+                <button type="submit" id="btnSubmit" class="btn-submit">
                     <span id="btnText">DAFTAR & AMBIL VOUCHER</span>
-                    <div id="spinner" class="spinner"></div>
+                    <div id="spinner" class="spinner" style="display:none; width:20px; height:20px; border:3px solid #fff; border-radius:50%; border-top-color:transparent; animation:spin .8s linear infinite; margin:0 auto"></div>
                 </button>
             </form>
         </div>
@@ -81,9 +72,7 @@
     <div id="voucherSection">
         <div id="captureArea" class="voucher-box">
             <div class="v-top">
-                <div class="logo-container" style="width:60px; height:60px; margin-bottom:5px; border:2px solid #fff;">
-                    <img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img" alt="Logo">
-                </div>
+                <div class="logo-container" style="width:60px; height:60px; margin-bottom:5px; border:2px solid #fff;"><img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img"></div>
                 <h6 class="font-weight-bold mb-0">EXCLUSIVE VOUCHER</h6>
                 <p style="font-size: 10px; margin:0;">Mie Judes Lamongan</p>
             </div>
@@ -108,8 +97,8 @@
 
     <div id="finalImageContainer">
         <h5 class="text-center font-weight-bold text-success mb-3">PENDAFTARAN BERHASIL! ✅</h5>
-        <img id="finalImage" alt="Voucher Mie Judes">
-        <p class="text-center mt-3 small text-white-50">Tekan lama gambar di atas, lalu pilih <b>"Simpan Gambar"</b> atau <b>"Download Image"</b>.</p>
+        <img id="finalImage">
+        <p class="text-center mt-3 small text-white-50">Tekan lama gambar di atas untuk <b>"Simpan Gambar"</b>.</p>
         <button onclick="location.reload()" class="btn btn-sm btn-outline-light mt-2">Daftar Member Lain</button>
     </div>
 </div>
@@ -119,44 +108,24 @@
     
     document.getElementById('formDaftar').addEventListener('submit', e => {
         e.preventDefault();
-        const btnSubmit = document.getElementById('btnSubmit');
         document.getElementById('btnText').style.display = 'none';
         document.getElementById('spinner').style.display = 'block';
-        btnSubmit.disabled = true;
+        document.getElementById('btnSubmit').disabled = true;
 
         fetch(scriptURL, { method: 'POST', body: new FormData(e.target)})
         .then(res => res.json())
         .then(res => {
-            // Isi data voucher mentah
             document.getElementById('resNama').innerText = res.nama.toUpperCase();
             document.getElementById('resKode').innerText = res.kode;
-            
-            // Sembunyikan form
             document.getElementById('formSection').style.display = 'none';
             
-            // Proses Render Gambar (tunggu sebentar agar browser siap)
             setTimeout(() => {
-                const area = document.getElementById('captureArea');
-                html2canvas(area, { 
-                    scale: 3, 
-                    useCORS: true, 
-                    logging: false,
-                    allowTaint: false
-                }).then(canvas => {
-                    const imageData = canvas.toDataURL("image/png");
-                    document.getElementById('finalImage').src = imageData;
-                    
-                    // Tampilkan gambar akhir
+                html2canvas(document.getElementById('captureArea'), { scale: 3, useCORS: true }).then(canvas => {
+                    document.getElementById('finalImage').src = canvas.toDataURL("image/png");
                     document.getElementById('finalImageContainer').style.display = 'block';
                     window.scrollTo(0,0);
                 });
             }, 500);
-        })
-        .catch(err => {
-            alert('Gangguan koneksi. Coba lagi!');
-            document.getElementById('btnText').style.display = 'block';
-            document.getElementById('spinner').style.display = 'none';
-            btnSubmit.disabled = false;
         });
     });
 </script>
