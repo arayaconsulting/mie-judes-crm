@@ -16,7 +16,10 @@
         .form-header { background: #d32f2f; padding: 30px 20px; text-align: center; color: #fff; }
         .logo-container { width: 90px; height: 90px; background: #000; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); border: 3px solid #fff; padding: 5px; overflow: hidden; }
         .logo-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
         .btn-submit { background: #d32f2f; color: #fff; border-radius: 12px; font-weight: 800; padding: 15px; border: none; width: 100%; transition: 0.3s; }
+        .btn-submit:hover { background: #b71c1c; transform: translateY(-2px); }
+
         .promo-choice { background: #f8f9fa; border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin-bottom: 8px; cursor: pointer; display: block; font-size: 13px; font-weight: 600; color: #555; }
         .promo-choice input { margin-right: 12px; }
 
@@ -25,11 +28,9 @@
         .voucher-box { background: #fff; width: 400px; color: #333; overflow: hidden; border-radius: 20px; }
         .v-top { background: #d32f2f; color: #fff; padding: 25px; text-align: center; }
         
-        /* WRAPPER KODE & SOBEKAN (Kunci utama agar pas) */
         .v-middle-wrap { position: relative; padding: 20px 30px 10px 30px; }
         .v-kode { font-size: 35px; font-weight: 800; color: #d32f2f; border: 3px dashed #d32f2f; padding: 10px; display: inline-block; width: 100%; background: #fff5f5; border-radius: 10px; letter-spacing: 2px; margin: 0; }
         
-        /* Notch menempel di bagian bawah wrapper kode */
         .v-cut { height: 34px; background: #1a1a1a; width: 34px; border-radius: 50%; position: absolute; bottom: -17px; z-index: 10; }
         .cut-left { left: -17px; } .cut-right { right: -17px; }
         
@@ -55,19 +56,34 @@
         <div class="p-4">
             <form id="formDaftar">
                 <input type="hidden" name="action" value="register">
-                <div class="form-group"><label class="small font-weight-bold">NAMA LENGKAP</label><input type="text" name="nama" class="form-control" required></div>
-                <div class="form-group"><label class="small font-weight-bold">WHATSAPP</label><input type="tel" name="hp" class="form-control" required></div>
-                <div class="form-group"><label class="small font-weight-bold">TANGGAL LAHIR</label><input type="date" name="tgl_lahir" class="form-control" required></div>
-                <div class="form-group"><label class="small font-weight-bold">PEKERJAAN</label><input type="text" name="pekerjaan" class="form-control" required></div>
+                <div class="form-group">
+                    <label class="small font-weight-bold text-muted">NAMA LENGKAP</label>
+                    <input type="text" name="nama" class="form-control" placeholder="Contoh: Ahmad Subarjo" required>
+                </div>
+                <div class="form-group">
+                    <label class="small font-weight-bold text-muted">NOMOR WHATSAPP</label>
+                    <input type="tel" name="hp" class="form-control" placeholder="Contoh: 081234567890" required>
+                </div>
+                <div class="form-group">
+                    <label class="small font-weight-bold text-muted">TANGGAL LAHIR</label>
+                    <input type="date" name="tgl_lahir" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="small font-weight-bold text-muted">PEKERJAAN</label>
+                    <input type="text" name="pekerjaan" class="form-control" placeholder="Contoh: Mahasiswa / Karyawan" required>
+                </div>
                 
-                <div class="form-group mt-3">
-                    <label class="small font-weight-bold text-danger">RENCANA KEDATANGAN</label>
+                <div class="form-group mt-4">
+                    <label class="small font-weight-bold text-danger text-uppercase">Rencana Kedatangan</label>
+                    <p class="text-muted" style="font-size: 11px; margin-top: -5px;">*Silakan pilih lebih dari satu sesuai rencana kunjungan Anda</p>
+                    
                     <label class="promo-choice"><input type="checkbox" name="p20" value="YA"> 20 Mei: Gratis Es Teh 🥤</label>
                     <label class="promo-choice"><input type="checkbox" name="p21" value="YA"> 21 Mei: Buy 1 Get 1 🍜</label>
                     <label class="promo-choice"><input type="checkbox" name="p22" value="YA"> 22 Mei: Free Mie Cerewet 🍝</label>
                     <label class="promo-choice"><input type="checkbox" name="p23" value="YA"> 23 Mei: Min 70rb Free Dimsum 🥟</label>
                 </div>
-                <button type="submit" id="btnSubmit" class="btn-submit">
+                
+                <button type="submit" id="btnSubmit" class="btn-submit mt-2 shadow">
                     <span id="btnText">DAFTAR & AMBIL VOUCHER</span>
                     <div id="spinner" class="spinner"></div>
                 </button>
