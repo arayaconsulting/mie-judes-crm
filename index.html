@@ -11,29 +11,36 @@
         body { font-family: 'Montserrat', sans-serif; background-color: #1a1a1a; color: #fff; }
         .main-container { max-width: 450px; margin: auto; padding: 20px; }
         
+        /* FORM STYLING */
         .card-form { background: #fff; border-radius: 25px; color: #333; overflow: hidden; border: none; }
         .form-header { background: #d32f2f; padding: 30px 20px; text-align: center; color: #fff; }
         .logo-container { width: 90px; height: 90px; background: #000; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); border: 3px solid #fff; padding: 5px; overflow: hidden; }
         .logo-img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .btn-submit { background: #d32f2f; color: #fff; border-radius: 12px; font-weight: 800; padding: 15px; border: none; width: 100%; transition: 0.3s; }
-        
-        .promo-choice { background: #f8f9fa; border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.3s; display: block; font-size: 13px; font-weight: 600; color: #555; }
-        .promo-choice input { margin-right: 12px; transform: scale(1.2); }
+        .promo-choice { background: #f8f9fa; border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin-bottom: 8px; cursor: pointer; display: block; font-size: 13px; font-weight: 600; color: #555; }
+        .promo-choice input { margin-right: 12px; }
 
+        /* VOUCHER DESIGN (HIDDEN) */
         #voucherSection { position: fixed; left: -9999px; top: 0; }
-        .voucher-box { background: #fff; width: 400px; color: #333; overflow: hidden; border-radius: 20px; position: relative; }
-        .v-top { background: #d32f2f; color: #fff; padding: 20px; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.4); }
-        .v-body { padding: 25px; text-align: center; position: relative; }
-        .v-kode { font-size: 35px; font-weight: 800; color: #d32f2f; border: 3px dashed #d32f2f; padding: 10px; display: inline-block; margin: 5px 0 15px 0; width: 100%; background: #fff5f5; border-radius: 10px; letter-spacing: 2px; }
+        .voucher-box { background: #fff; width: 400px; color: #333; overflow: hidden; border-radius: 20px; }
+        .v-top { background: #d32f2f; color: #fff; padding: 25px; text-align: center; }
         
-        /* PERBAIKAN FINAL SOBEKAN: Mengurangi top agar naik ke atas */
-        .v-cut { height: 34px; background: #1a1a1a; width: 34px; border-radius: 50%; position: absolute; top: 206px; z-index: 10; }
+        /* WRAPPER KODE & SOBEKAN (Kunci utama agar pas) */
+        .v-middle-wrap { position: relative; padding: 20px 30px 10px 30px; }
+        .v-kode { font-size: 35px; font-weight: 800; color: #d32f2f; border: 3px dashed #d32f2f; padding: 10px; display: inline-block; width: 100%; background: #fff5f5; border-radius: 10px; letter-spacing: 2px; margin: 0; }
+        
+        /* Notch menempel di bagian bawah wrapper kode */
+        .v-cut { height: 34px; background: #1a1a1a; width: 34px; border-radius: 50%; position: absolute; bottom: -17px; z-index: 10; }
         .cut-left { left: -17px; } .cut-right { right: -17px; }
         
-        .v-promo-list { text-align: left; background: #fdf2f2; padding: 12px; border-radius: 10px; font-size: 13px; border: 1px solid #ffcccc; margin-top: 5px; }
+        .v-bottom-wrap { padding: 25px 30px 30px 30px; text-align: center; border-top: 1px dashed #ccc; }
+        .v-promo-list { text-align: left; background: #fdf2f2; padding: 12px; border-radius: 10px; font-size: 13px; border: 1px solid #ffcccc; }
 
+        /* FINAL IMAGE CONTAINER */
         #finalImageContainer { display: none; text-align: center; }
-        #finalImage { max-width: 100%; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); border: 1px solid #444; }
+        #finalImage { max-width: 100%; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .spinner { display: none; width: 20px; height: 20px; border: 3px solid #fff; border-radius: 50%; border-top-color: transparent; animation: spin .8s linear infinite; margin: 0 auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -48,8 +55,8 @@
         <div class="p-4">
             <form id="formDaftar">
                 <input type="hidden" name="action" value="register">
-                <div class="form-group"><label class="small font-weight-bold">NAMA LENGKAP</label><input type="text" name="nama" class="form-control" placeholder="Nama Anda" required></div>
-                <div class="form-group"><label class="small font-weight-bold">WHATSAPP</label><input type="tel" name="hp" class="form-control" placeholder="08xxxxxxxx" required></div>
+                <div class="form-group"><label class="small font-weight-bold">NAMA LENGKAP</label><input type="text" name="nama" class="form-control" required></div>
+                <div class="form-group"><label class="small font-weight-bold">WHATSAPP</label><input type="tel" name="hp" class="form-control" required></div>
                 <div class="form-group"><label class="small font-weight-bold">TANGGAL LAHIR</label><input type="date" name="tgl_lahir" class="form-control" required></div>
                 <div class="form-group"><label class="small font-weight-bold">PEKERJAAN</label><input type="text" name="pekerjaan" class="form-control" required></div>
                 
@@ -60,10 +67,9 @@
                     <label class="promo-choice"><input type="checkbox" name="p22" value="YA"> 22 Mei: Free Mie Cerewet 🍝</label>
                     <label class="promo-choice"><input type="checkbox" name="p23" value="YA"> 23 Mei: Min 70rb Free Dimsum 🥟</label>
                 </div>
-
                 <button type="submit" id="btnSubmit" class="btn-submit">
                     <span id="btnText">DAFTAR & AMBIL VOUCHER</span>
-                    <div id="spinner" class="spinner" style="display:none; width:20px; height:20px; border:3px solid #fff; border-radius:50%; border-top-color:transparent; animation:spin .8s linear infinite; margin:0 auto"></div>
+                    <div id="spinner" class="spinner"></div>
                 </button>
             </form>
         </div>
@@ -76,13 +82,15 @@
                 <h6 class="font-weight-bold mb-0">EXCLUSIVE VOUCHER</h6>
                 <p style="font-size: 10px; margin:0;">Mie Judes Lamongan</p>
             </div>
-            <div class="v-body">
-                <p class="mb-1 small">Halo, <b id="resNama"></b>!</p>
-                <div class="v-kode" id="resKode"></div>
-                
+            
+            <div class="v-middle-wrap">
+                <p class="mb-2 small text-center">Halo, <b id="resNama"></b>!</p>
+                <div class="v-kode text-center" id="resKode"></div>
                 <div class="v-cut cut-left"></div>
                 <div class="v-cut cut-right"></div>
-                
+            </div>
+            
+            <div class="v-bottom-wrap">
                 <div class="v-promo-list">
                     <b class="text-danger">PILIHAN PROMO:</b><br>
                     🎁 20 Mei: Gratis Es Teh<br>
@@ -125,7 +133,7 @@
                     document.getElementById('finalImageContainer').style.display = 'block';
                     window.scrollTo(0,0);
                 });
-            }, 500);
+            }, 600);
         });
     });
 </script>
