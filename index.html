@@ -139,17 +139,34 @@
         fetch(scriptURL, { method: 'POST', body: new FormData(e.target)})
         .then(res => res.json())
         .then(res => {
-            document.getElementById('resNama').innerText = res.nama.toUpperCase();
-            document.getElementById('resKode').innerText = res.kode;
-            document.getElementById('formSection').style.display = 'none';
-            
-            setTimeout(() => {
-                html2canvas(document.getElementById('captureArea'), { scale: 3, useCORS: true }).then(canvas => {
-                    document.getElementById('finalImage').src = canvas.toDataURL("image/png");
-                    document.getElementById('finalImageContainer').style.display = 'block';
-                    window.scrollTo(0,0);
-                });
-            }, 600);
+            if (res.success) {
+                // Jalankan proses pembuatan voucher jika berhasil
+                document.getElementById('resNama').innerText = res.nama.toUpperCase();
+                document.getElementById('resKode').innerText = res.kode;
+                document.getElementById('formSection').style.display = 'none';
+                
+                setTimeout(() => {
+                    html2canvas(document.getElementById('captureArea'), { 
+                        scale: 3, 
+                        useCORS: true,
+                        allowTaint: false 
+                    }).then(canvas => {
+                        document.getElementById('finalImage').src = canvas.toDataURL("image/png");
+                        document.getElementById('finalImageContainer').style.display = 'block';
+                        window.scrollTo(0,0);
+                    });
+                }, 600);
+            } else {
+                // Tampilkan pesan error jika nomor duplikat (Validasi Duplikasi)
+                alert(res.message);
+                document.getElementById('btnText').style.display = 'block';
+                document.getElementById('spinner').style.display = 'none';
+                document.getElementById('btnSubmit').disabled = false;
+            }
+        })
+        .catch(error => {
+            alert('Terjadi kesalahan koneksi.');
+            location.reload();
         });
     });
 </script>
