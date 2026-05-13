@@ -18,8 +18,9 @@
         .btn-judes { background: #d32f2f; color: #fff; border-radius: 12px; font-weight: 800; padding: 12px; border: none; width: 100%; }
         .btn-success-custom { background: #27ae60; color: #fff; border-radius: 12px; font-weight: 800; padding: 12px; border: none; width: 100%; }
         #resultPoin, #resultVoucher { display: none; border-radius: 15px; }
-        .reminder-box { background: #1a1a1a; border: 1px solid #333; border-radius: 15px; padding: 15px; margin-bottom: 10px; }
-        .badge-notif { background: #d32f2f; font-size: 10px; padding: 4px 8px; border-radius: 5px; color: #fff; }
+        .reminder-box { background: #1a1a1a; border: 1px solid #333; border-radius: 15px; padding: 15px; margin-bottom: 10px; transition: 0.3s; }
+        .badge-notif { background: #d32f2f; font-size: 10px; padding: 4px 8px; border-radius: 5px; color: #fff; font-weight: 800; text-transform: uppercase; }
+        label { font-size: 11px; letter-spacing: 1px; color: #666; font-weight: 800; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -29,11 +30,11 @@
         <div class="logo-wrap shadow">
             <img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img" alt="Logo Mie Judes">
         </div>
-        <h4 class="font-weight-bold mb-0">MIE JUDES</h4>
-        <p class="small text-white-50">Panel CRM Kasir</p>
+        <h4 class="font-weight-bold mb-0" style="letter-spacing: 2px;">MIE JUDES</h4>
+        <p class="small text-white-50 text-uppercase">Panel CRM Kasir</p>
     </div>
 
-    <ul class="nav nav-pills nav-fill shadow-sm" id="pills-tab" role="tablist">
+    <ul class="nav nav-pills nav-fill shadow-sm" role="tablist">
         <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tab-poin">INPUT POIN</a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-voucher">CEK VOUCHER</a></li>
     </ul>
@@ -44,19 +45,19 @@
                 <form id="formPoin">
                     <input type="hidden" name="action" value="updateTransaksi">
                     <div class="form-group">
-                        <label class="small font-weight-bold">WA MEMBER</label>
-                        <input type="tel" name="hp" class="form-control" placeholder="08xxxxxxxx" required>
+                        <label>WA MEMBER</label>
+                        <input type="tel" name="hp" class="form-control" placeholder="08xxxxxxxx" required style="border-radius:10px;">
                     </div>
                     <div class="form-group">
-                        <label class="small font-weight-bold">TOTAL BELANJA (RP)</label>
-                        <input type="number" name="nominal" class="form-control" placeholder="Contoh: 50000" required>
+                        <label>TOTAL BELANJA (RP)</label>
+                        <input type="number" name="nominal" class="form-control" placeholder="Contoh: 50000" required style="border-radius:10px;">
                     </div>
                     <button type="submit" class="btn-success-custom shadow">SIMPAN TRANSAKSI</button>
                 </form>
-                <div id="resultPoin" class="mt-3 alert alert-success text-center shadow-sm text-dark">
+                <div id="resultPoin" class="mt-3 alert alert-success text-center shadow-sm text-dark border-0">
                     <h6 class="font-weight-bold mb-1" id="resPoinNama"></h6>
                     <h4 class="font-weight-bold" id="resPoinTotal"></h4>
-                    <a id="btnWA" href="#" target="_blank" class="btn btn-dark btn-sm btn-block mt-2 font-weight-bold text-white">KIRIM UPDATE KE WA</a>
+                    <a id="btnWA" href="#" target="_blank" class="btn btn-dark btn-sm btn-block mt-2 font-weight-bold text-white shadow-sm">KIRIM UPDATE KE WA</a>
                 </div>
             </div>
         </div>
@@ -66,26 +67,31 @@
                 <form id="formVoucher">
                     <input type="hidden" name="action" value="claimVoucher">
                     <div class="form-group">
-                        <label class="small font-weight-bold">MASUKKAN KODE VOUCHER</label>
-                        <input type="text" name="kode_voucher" class="form-control text-center font-weight-bold text-danger" style="font-size: 24px;" placeholder="MJ-XXXX" required>
+                        <label>MASUKKAN KODE VOUCHER</label>
+                        <input type="text" name="kode_voucher" class="form-control text-center font-weight-bold text-danger" style="font-size: 24px; border-radius:10px;" placeholder="MJ-XXXX" required>
                     </div>
                     <button type="submit" class="btn-judes shadow">VALIDASI KODE</button>
                 </form>
-                <div id="resultVoucher" class="mt-3 p-3 border shadow-sm">
+                <div id="resultVoucher" class="mt-3 p-3 border-0 shadow-sm text-dark">
                     <h5 class="font-weight-bold mb-1" id="resVStatus"></h5>
                     <div class="text-left small mt-2">
-                        <div>Nama: <b id="resVNama"></b></div>
-                        <div>Pekerjaan: <b id="resVPekerjaan"></b></div>
-                        <div>Saldo Poin: <b id="resVPoin"></b></div>
+                        <div class="d-flex justify-content-between"><span>Nama:</span><b id="resVNama">-</b></div>
+                        <div class="d-flex justify-content-between"><span>Pekerjaan:</span><b id="resVPekerjaan">-</b></div>
+                        <div class="d-flex justify-content-between"><span>Saldo Poin:</span><b id="resVPoin">-</b></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <h6 class="mt-5 font-weight-bold text-warning text-uppercase" style="letter-spacing: 1px;">🔔 Pengingat Hari Ini</h6>
-    <div id="reminderList" class="mt-3">
-        <div class="text-center text-white-50 py-3" id="loadRem">Mengecek data...</div>
+    <div class="mt-5 mb-3 d-flex align-items-center justify-content-center">
+        <div style="flex:1; height:1px; background:#333;"></div>
+        <h6 class="mx-3 font-weight-bold text-warning mb-0" style="letter-spacing: 1px;">🔔 PENGINGAT HARI INI</h6>
+        <div style="flex:1; height:1px; background:#333;"></div>
+    </div>
+
+    <div id="reminderList" class="text-left">
+        <p class="text-center text-white-50 small py-4" id="loadRem">Mengecek data...</p>
     </div>
 </div>
 
@@ -95,11 +101,47 @@
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxjxViMtbQSaD30Qt1GHaKS0wxanC92OBFqPGzVhiqws1GyhbwsFXS2LQBcKC1JlTMJ/exec';
 
+    // Fungsi Arsip Notifikasi (Update Kolom M)
+    function archiveNotif(noHP, waURL) {
+        window.open(waURL, '_blank');
+        fetch(scriptURL + "?action=konfirmasiSapaan&hp=" + noHP, { method: 'POST' })
+        .then(() => {
+            setTimeout(() => { loadReminders(); }, 1000);
+        });
+    }
+
+    // Load Reminders
+    function loadReminders() {
+        const list = document.getElementById('reminderList');
+        list.innerHTML = "<p class='text-center text-white-50 small py-4'>Memperbarui agenda...</p>";
+        
+        fetch(scriptURL + "?action=getReminders")
+        .then(res => res.json())
+        .then(data => {
+            list.innerHTML = "";
+            if(data.length === 0) {
+                list.innerHTML = "<p class='text-center small text-white-50 py-4'>Tidak ada agenda sapa pelanggan hari ini.</p>";
+                return;
+            }
+            data.forEach(item => {
+                const waURL = "https://wa.me/" + item.wa + "?text=" + encodeURIComponent(item.pesan);
+                list.innerHTML += `
+                    <div class="reminder-box d-flex justify-content-between align-items-center shadow-sm">
+                        <div>
+                            <span class="badge-notif">${item.tipe}</span>
+                            <div class="font-weight-bold mt-1 text-white">${item.nama}</div>
+                        </div>
+                        <button onclick="archiveNotif('${item.hp}', '${waURL}')" class="btn btn-sm btn-primary font-weight-bold" style="border-radius:8px;">SAPA WA</button>
+                    </div>`;
+            });
+        });
+    }
+
+    // Submit Poin
     document.getElementById('formPoin').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = this.querySelector('button');
-        btn.innerText = "Memproses...";
-        btn.disabled = true;
+        btn.innerText = "Memproses..."; btn.disabled = true;
         fetch(scriptURL, { method: 'POST', body: new FormData(this)})
         .then(res => res.json())
         .then(res => {
@@ -108,54 +150,38 @@
                 document.getElementById('resPoinNama').innerText = res.nama;
                 document.getElementById('resPoinTotal').innerText = res.totalPoin + " POIN";
                 document.getElementById('btnWA').href = "https://wa.me/" + res.wa + "?text=" + encodeURIComponent(res.pesan);
+                this.reset();
             } else { alert(res.message); }
             btn.innerText = "SIMPAN TRANSAKSI"; btn.disabled = false;
         });
     });
 
+    // Validasi Voucher
     document.getElementById('formVoucher').addEventListener('submit', function(e) {
         e.preventDefault();
+        const btn = this.querySelector('button');
+        btn.innerText = "Mengecek..."; btn.disabled = true;
         fetch(scriptURL, { method: 'POST', body: new FormData(this)})
         .then(res => res.json())
         .then(res => {
             const resDiv = document.getElementById('resultVoucher');
             resDiv.style.display = 'block';
             if(res.success) {
-                resDiv.className = "mt-3 p-3 border-success alert-success text-dark shadow-sm";
+                resDiv.className = "mt-3 p-3 alert alert-success text-dark border-0 shadow-sm";
                 document.getElementById('resVStatus').innerText = "KODE VALID! ✅";
                 document.getElementById('resVNama').innerText = res.nama;
                 document.getElementById('resVPekerjaan').innerText = res.pekerjaan;
                 document.getElementById('resVPoin').innerText = res.poin + " Poin";
             } else {
-                resDiv.className = "mt-3 p-3 border-danger alert-danger text-dark shadow-sm";
+                resDiv.className = "mt-3 p-3 alert alert-danger text-dark border-0 shadow-sm";
                 document.getElementById('resVStatus').innerText = "TIDAK DITEMUKAN ❌";
                 document.getElementById('resVNama').innerText = "-";
             }
+            btn.innerText = "VALIDASI KODE"; btn.disabled = false;
         });
     });
 
-    window.onload = () => {
-        fetch(scriptURL + "?action=getReminders")
-        .then(res => res.json())
-        .then(data => {
-            const list = document.getElementById('reminderList');
-            document.getElementById('loadRem').remove();
-            if(data.length === 0) {
-                list.innerHTML = "<p class='text-center small text-white-50'>Tidak ada agenda sapa pelanggan hari ini.</p>";
-                return;
-            }
-            data.forEach(item => {
-                list.innerHTML += `
-                    <div class="reminder-box d-flex justify-content-between align-items-center">
-                        <div>
-                            <span class="badge-notif">${item.tipe}</span>
-                            <div class="font-weight-bold mt-1">${item.nama}</div>
-                        </div>
-                        <a href="https://wa.me/${item.wa}?text=${encodeURIComponent(item.pesan)}" target="_blank" class="btn btn-sm btn-primary font-weight-bold">SAPA WA</a>
-                    </div>`;
-            });
-        });
-    };
+    window.onload = loadReminders;
 </script>
 </body>
 </html>
