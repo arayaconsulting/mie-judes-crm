@@ -1,191 +1,155 @@
-/**
- * CRM MIE JUDES - SCRIPT TERPADU OPERASIONAL HARIAN (MEMBER TETAP)
- * Fitur: Registrasi/Cetak Ulang Pintar (Nama + No HP Masuk Voucher), Update Poin, Cek Member, 
- * & Pengingat Otomatis dengan fitur Arsip Notifikasi (Update Kolom M)
- */
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Portal - Mie Judes</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background-color: #121212; color: #fff; }
+        .main-container { max-width: 450px; margin: auto; padding: 20px; }
+        .logo-main { width: 100px; height: 100px; background: #000; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; border: 3px solid #ffcc00; overflow: hidden; padding: 5px; box-shadow: 0 0 20px rgba(255, 204, 0, 0.4); }
+        .logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .card-promo { background: #fff; border-radius: 25px; color: #333; padding: 25px; border: none; }
+        .form-control { border-radius: 10px; padding: 12px; font-size: 14px; }
+        .btn-submit { background: #ffcc00; color: #000; border-radius: 12px; font-weight: 800; padding: 15px; border: none; width: 100%; margin-top: 15px; }
+        #voucherSection { position: fixed; left: -9999px; top: 0; }
+        .v-box { background: #fff; width: 380px; color: #333; border-radius: 20px; overflow: hidden; border: 4px solid #ffcc00; }
+        .v-header { background: #ffcc00; color: #000; padding: 20px; text-align: center; }
+        .v-body { padding: 25px; text-align: center; border-bottom: 2px dashed #ccc; position: relative; }
+        .v-footer { background: #fffdf5; padding: 15px; text-align: center; font-size: 11px; }
+        .v-cut { height: 30px; background: #fffdf5; width: 30px; border-radius: 50%; position: absolute; bottom: -15px; z-index: 10; }
+        .cut-left { left: -15px; } .cut-right { right: -15px; }
+        #resultArea { display: none; text-align: center; margin-top: 20px; }
+        #finalVoucher { max-width: 100%; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); border: 2px solid #ffcc00; }
+        .phone-badge { display: inline-block; background: #121212; color: #ffcc00; font-weight: bold; padding: 5px 15px; border-radius: 20px; font-size: 14px; margin-top: 2px; }
+        .info-status { font-size: 12px; font-weight: bold; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
 
-var NAMA_BRAND = "MIE JUDES";
-var TEKS_HADIAH = "\n🎁 *PROGRAM TUKAR POIN:* \n━━━━━━━━━━━━━━━\n🔹 15 Poin : Es Teh Manis 🥤\n🔹 20 Poin : Snack Sosis 🌭\n🔹 25 Poin : Dimsum Special 🥟\n🔹 30 Poin : Mie Kentir / Mie Judes 🍜\n";
+<div class="main-container text-center">
+    <div class="logo-main shadow">
+        <img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img" alt="Logo Mie Judes">
+    </div>
 
-function doGet(e) {
-  if (e.parameter.action == 'getReminders') {
-    return ContentService.createTextOutput(JSON.stringify(getReminders())).setMimeType(ContentService.MimeType.JSON);
-  }
-  return HtmlService.createHtmlOutputFromFile('index');
-}
+    <div class="mb-4">
+        <h2 class="font-weight-bold" style="color: #ffcc00; letter-spacing: 1px;">MEMBER PORTAL 🎉</h2>
+        <p class="small text-white-50">Daftar Member Baru / Cetak Kartu Member Lama<br><b>Cukup Masukkan Nomor WhatsApp Anda!</b></p>
+    </div>
 
-function doPost(e) {
-  var action = e.parameter.action;
-  if (action == 'updateTransaksi') {
-    return ContentService.createTextOutput(JSON.stringify(updateTransaksi(e.parameter))).setMimeType(ContentService.MimeType.JSON);
-  } else if (action == 'claimVoucher') {
-    return ContentService.createTextOutput(JSON.stringify(claimVoucher(e.parameter))).setMimeType(ContentService.MimeType.JSON);
-  } else if (action == 'konfirmasiSapaan') {
-    return ContentService.createTextOutput(JSON.stringify(konfirmasiSapaan(e.parameter))).setMimeType(ContentService.MimeType.JSON);
-  } else {
-    return ContentService.createTextOutput(JSON.stringify(processForm(e.parameter))).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+    <div id="mainForm" class="card-promo shadow-lg">
+        <form id="formKlaim">
+            <input type="hidden" name="action" value="daftarMemberBaru">
+            
+            <div class="form-group text-left">
+                <label class="small font-weight-bold text-muted">NOMOR WHATSAPP</label>
+                <input type="tel" id="inputHP" name="hp" class="form-control" placeholder="Contoh: 08123xxxx" required>
+            </div>
 
-// ============================================================
-// FUNGSI UNTUK MENGHILANGKAN NOTIFIKASI (UPDATE KOLOM M)
-// ============================================================
-function konfirmasiSapaan(data) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheets()[0];
-  var values = sheet.getDataRange().getValues();
-  var noHP = data.hp.toString().trim();
-  
-  for (var i = 1; i < values.length; i++) {
-    var currentHP = values[i][2].toString().replace("'", "").trim();
-    if (currentHP == noHP) {
-      // Update Kolom M (index 12) dengan tanggal saat ini
-      sheet.getRange(i + 1, 13).setValue(new Date());
-      return { success: true, message: "Notifikasi " + NAMA_BRAND + " diarsipkan." };
-    }
-  }
-  return { success: false };
-}
+            <!-- Bagian ini otomatis opsional, diisi jika pelanggan baru -->
+            <div id="formTambahan">
+                <div class="form-group text-left">
+                    <label class="small font-weight-bold text-muted">NAMA LENGKAP</label>
+                    <input type="text" id="inputNama" name="nama" class="form-control" placeholder="Nama lengkap Anda (Kosongkan jika sudah jadi member GO)">
+                </div>
+                <div class="form-group text-left">
+                    <label class="small font-weight-bold text-muted">TANGGAL LAHIR</label>
+                    <input type="date" id="inputTgl" name="tgl_lahir" class="form-control">
+                </div>
+                <div class="form-group text-left">
+                    <label class="small font-weight-bold text-muted">PEKERJAAN</label>
+                    <input type="text" id="inputKerja" name="pekerjaan" class="form-control" placeholder="Mahasiswa / Karyawan / Umum">
+                </div>
+            </div>
 
-// 1. PROSES PENDAFTARAN / CETAK ULANG MEMBER PINTAR (2-IN-1)
-function processForm(data) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheets()[0];
-  var values = sheet.getDataRange().getValues();
-  var inputHP = data.hp.toString().trim();
-  
-  // LOGIKA BARU: Cek apakah nomor HP sudah terdaftar (Alumni Grand Opening / Member Lama)
-  for (var i = 1; i < values.length; i++) {
-    var existingHP = values[i][2].toString().replace("'", "").trim();
-    if (existingHP == inputHP) {
-      // Jika sudah terdaftar, langsung kirim data lama untuk dicetak ulang vouchernya tanpa dobel data
-      return { 
-        success: true, 
-        is_lama: true,
-        nama: values[i][1].toUpperCase(), 
-        hp: existingHP,
-        kode: values[i][10], // Mengambil Kode Voucher dari kolom K (index 10)
-        valid: "MEMBER OFFICIAL MIE JUDES 🎉" 
-      };
-    }
-  }
+            <button type="submit" id="btnSubmit" class="btn-submit shadow">PROSES KARTU MEMBER</button>
+        </form>
+    </div>
 
-  // Jika BELUM terdaftar, proses normal masukkan baris data baru ke Spreadsheet
-  var kode = "MJ-" + Math.random().toString(36).substr(2, 4).toUpperCase();
-  var p20 = data.p20 ? "YA" : "";
-  var p21 = data.p21 ? "YA" : "";
-  var p22 = data.p22 ? "YA" : "";
-  var p23 = data.p23 ? "YA" : "";
-  var p24 = data.p24 ? "YA" : "";
+    <div id="resultArea">
+        <div id="statusPesan" class="alert info-status"></div>
+        <img id="finalVoucher" class="img-fluid">
+        <div class="alert alert-warning mt-3 py-2 px-3" style="border-radius: 15px; font-size: 12px; color: #333;">
+            <b>CARA SIMPAN:</b> Tekan lama pada gambar voucher di atas, lalu pilih <b>"Simpan Gambar"</b>.
+        </div>
+        <p class="mt-4 small text-white-50">Tunjukkan voucher ini ke kasir Mie Judes saat bertransaksi.</p>
+        <button onclick="location.reload()" class="btn btn-sm btn-outline-light mt-2">Kembali</button>
+    </div>
+</div>
 
-  sheet.appendRow([
-    new Date(), 
-    data.nama.toUpperCase(), 
-    "'" + data.hp, 
-    data.tgl_lahir, 
-    data.pekerjaan, 
-    p20, p21, p22, p23, p24, // Kolom F-J
-    kode,                    // Kolom K (index 10)
-    0,                       // Kolom L (index 11) - Saldo Poin
-    new Date()              // Kolom M (index 12) - Update Terakhir
-  ]);
-  
-  return { 
-    success: true, 
-    is_lama: false,
-    nama: data.nama.toUpperCase(), 
-    hp: inputHP,
-    kode: kode, 
-    valid: "VOUCHER MEMBER BARU 🎉" 
-  };
-}
+<div id="voucherSection">
+    <div id="vCapture" class="v-box">
+        <div class="v-header">
+            <h5 class="font-weight-bold mb-0">WELCOME MEMBER VOUCHER</h5>
+            <small>MIE JUDES OFFICIAL</small>
+        </div>
+        <div class="v-body">
+            <p class="mb-1 small text-muted text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Nama Member:</p>
+            <h4 class="font-weight-bold" id="resNama" style="color: #333; margin-bottom: 12px;"></h4>
+            
+            <p class="mb-1 small text-muted text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Nomor WhatsApp:</p>
+            <div class="phone-badge" id="resHP"></div>
+            
+            <hr style="border-top: 2px dashed #ffcc00; width: 80%; margin: 20px auto;">
+            
+            <h3 class="font-weight-bold text-danger mb-1" style="letter-spacing: 0.5px;">OFFICIAL MEMBER</h3>
+            <p class="mb-0 small text-muted" style="font-weight: 600;">Terdaftar dalam Sistem Kasir CRM</p>
+            <div class="v-cut cut-left"></div><div class="v-cut cut-right"></div>
+        </div>
+        <div class="v-footer">
+            <p class="mb-1 font-weight-bold">KODE MEMBER: <span id="resKode" style="color: #ffcc00;"></span></p>
+            <p class="mb-0 text-danger font-weight-bold" id="resValid" style="font-size: 13px; text-transform: uppercase; border: 1px solid #d32f2f; display: inline-block; padding: 2px 12px; border-radius: 5px; background: #fff;"></p>
+            <p class="mb-0 text-muted mt-2" style="font-size: 8px;">*Tunjukkan voucher ini ke kasir untuk mempermudah proses transaksi</p>
+        </div>
+    </div>
+</div>
 
-// 2. FUNGSI UPDATE TRANSAKSI (TETAP SESUAI STRUKTUR IDEAL)
-function updateTransaksi(data) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheets()[0];
-  var values = sheet.getDataRange().getValues();
-  var noHP = data.hp.toString().trim();
-  var waLink = noHP.startsWith('0') ? '62' + noHP.slice(1) : noHP;
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxYWWjEPsnPRtOdlUUJJSvcwAG91hTq2t6VXay6hi6wuSlOH8FoGEYDppb8_OCsnOvQ/exec';
 
-  var nominal = parseFloat(data.nominal);
-  var poinBaru = Math.floor(nominal / 10000); 
-  
-  for (var i = 1; i < values.length; i++) {
-    if (values[i][2] == noHP || values[i][2] == "'" + noHP) {
-      var poinLama = Number(values[i][11]) || 0; 
-      var totalPoin = poinLama + poinBaru;
-      
-      sheet.getRange(i + 1, 12).setValue(totalPoin); // Update Kolom L
-      sheet.getRange(i + 1, 13).setValue(new Date()); // Update Kolom M
-      
-      var pesanWA = "*STRUK POIN MIE JUDES*\n━━━━━━━━━━━━━━━\nTerima kasih Kak *" + values[i][1] + "*, kunjungan Kakak sangat berarti bagi kami! 🙏\n\n📝 *INFO POIN:*\n• Belanja: Rp " + nominal.toLocaleString('id-ID') + "\n• Poin Baru: +" + poinBaru + "\n\n💰 *TOTAL SALDO: " + totalPoin + " POIN*\n━━━━━━━━━━━━━━━" + TEKS_HADIAH + "\nKumpulkan terus poinnya dan nikmati menu favorit GRATIS! 🔥";
-      
-      return { success: true, nama: values[i][1], wa: waLink, pesan: pesanWA, totalPoin: totalPoin };
-    }
-  }
-  return { success: false, message: "Nomor Member tidak terdaftar!" };
-}
+    document.getElementById('formKlaim').addEventListener('submit', e => {
+        e.preventDefault();
+        const btn = document.getElementById('btnSubmit');
+        btn.innerText = "Mengecek Database..."; btn.disabled = true;
 
-// 3. FUNGSI CEK MEMBER (TETAP SESUAI STRUKTUR IDEAL)
-function claimVoucher(data) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheets()[0];
-  var values = sheet.getDataRange().getValues();
-  var kodeInput = data.kode_voucher.toUpperCase().trim();
-  
-  for (var i = 1; i < values.length; i++) {
-    if (values[i][10] == kodeInput) { 
-      return { success: true, nama: values[i][1], pekerjaan: values[i][4], poin: values[i][11], message: "KODE VALID!" };
-    }
-  }
-  return { success: false, message: "KODE TIDAK DITEMUKAN!" };
-}
+        fetch(scriptURL, { method: 'POST', body: new FormData(e.target)})
+        .then(res => res.json()).then(res => {
+            if (res.success) {
+                document.getElementById('resNama').innerText = res.nama.toUpperCase();
+                document.getElementById('resHP').innerText = res.hp;
+                document.getElementById('resKode').innerText = res.kode;
+                document.getElementById('resValid').innerText = res.valid;
+                
+                const statusBox = document.getElementById('statusPesan');
+                if(res.is_lama) {
+                    statusBox.className = "alert info-status alert-primary";
+                    statusBox.innerText = "DATA MEMBER DITEMUKAN! KARTU ANDA BERHASIL DICETAK ULANG. ✅";
+                } else {
+                    statusBox.className = "alert info-status alert-success";
+                    statusBox.innerText = "PENDAFTARAN BERHASIL! SELAMAT BERGABUNG. ✅";
+                }
 
-// 4. FUNGSI PENGINGAT OTOMATIS (LOGIKA AUTO-HIDE BERDASARKAN KOLOM M)
-function getReminders() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheets()[0];
-  var data = sheet.getDataRange().getValues();
-  var today = new Date();
-  var besok = new Date(); besok.setDate(today.getDate() + 1);
-  var reminders = [];
-  
-  var todayStr = Utilities.formatDate(today, "GMT+7", "yyyy-MM-dd");
-  
-  for (var i = 1; i < data.length; i++) {
-    var rawWA = data[i][2].toString().trim().replace("'", "");
-    var waLink = rawWA.startsWith('0') ? '62' + rawWA.slice(1) : rawWA;
-    var tglLahir = new Date(data[i][3]);
-    var tglUpdateTerakhir = new Date(data[i][12]); // Kolom M (Index 12)
-    var lastUpdateStr = Utilities.formatDate(tglUpdateTerakhir, "GMT+7", "yyyy-MM-dd");
-
-    // Sapaan Hari-H Ultah (Hide jika sudah disapa hari ini)
-    if (tglLahir.getDate() == today.getDate() && tglLahir.getMonth() == today.getMonth() && lastUpdateStr !== todayStr) {
-      reminders.push({
-        tipe: "ULTAH HARI INI! 🎉",
-        nama: data[i][1], hp: rawWA, wa: waLink,
-        pesan: "*HAPPY BIRTHDAY KAK " + data[i][1].toUpperCase() + "!* 🎂🥳 Di hari spesial ini, Kakak berhak mengklaim *KADO MIE GRATIS* dari Mie Judes. Yuk mampir hari ini dan tunjukkan pesan ini ke kasir ya! ✨"
-      });
-    }
-    // Sapaan H-1 Ultah (Hide jika sudah disapa hari ini)
-    else if (tglLahir.getDate() == besok.getDate() && tglLahir.getMonth() == besok.getMonth() && lastUpdateStr !== todayStr) {
-      reminders.push({
-        tipe: "ULTAH BESOK! 🎁",
-        nama: data[i][1], hp: rawWA, wa: waLink,
-        pesan: "Halo Kak " + data[i][1] + ", besok Kakak ulang tahun ya? 😍 Spesial buat besok ada *Kado Mie Gratis* dari Mie Judes buat Kakak. Sampai jumpa besok di outlet ya! ✨"
-      });
-    }
-
-    // Pengingat 10 Hari (Auto-hide jika update terakhir < 10 hari yang lalu)
-    var selisihHari = Math.floor((today - tglUpdateTerakhir) / (1000 * 60 * 60 * 24));
-    if (selisihHari >= 10) {
-      reminders.push({
-        tipe: "RETENSI 🍜",
-        nama: data[i][1], hp: rawWA, wa: waLink,
-        pesan: "*KAMI RINDU KAKAK: MIE JUDES* 🥺\n━━━━━━━━━━━━━━━\nHalo Kak " + data[i][1] + ", sudah 10 hari nih nggak mampir ke Mie Judes. Poin Kakak saat ini: *" + data[i][11] + " POIN*.\n" + TEKS_HADIAH + "\nMampir yuk Kak, kami tunggu kehadirannya! 🔥"
-      });
-    }
-  }
-  return reminders;
-}
+                document.getElementById('mainForm').style.display = 'none';
+                setTimeout(() => {
+                    html2canvas(document.getElementById('vCapture'), {scale: 3, useCORS: true}).then(canvas => {
+                        document.getElementById('finalVoucher').src = canvas.toDataURL("image/png");
+                        document.getElementById('resultArea').style.display = 'block';
+                        window.scrollTo(0,0);
+                    });
+                }, 500);
+            } else {
+                alert(res.message);
+                btn.innerText = "PROSES KARTU MEMBER"; btn.disabled = false;
+            }
+        }).catch(err => {
+            alert('Sistem sedang sibuk. Mohon coba lagi nanti.');
+            btn.disabled = false;
+            btn.innerText = "PROSES KARTU MEMBER";
+        });
+    });
+</script>
+</body>
+</html>
