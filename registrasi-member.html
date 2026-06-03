@@ -61,19 +61,19 @@
                 <input type="tel" id="inputHP" name="hp" class="form-control" placeholder="Contoh: 08123xxxx" required>
             </div>
 
-            <!-- Bagian ini diisi lengkap untuk member baru (opsional bagi member lama) -->
+            <!-- PERBAIKAN: Menambahkan atribut 'name' pada setiap input agar terbaca di Google Sheets -->
             <div id="formTambahan">
                 <div class="form-group text-left">
                     <label class="small font-weight-bold text-white-50">NAMA LENGKAP</label>
-                    <input type="text" id="inputNama" class="form-control" placeholder="Nama Anda (Kosongkan jika member lama)">
+                    <input type="text" id="inputNama" name="nama" class="form-control" placeholder="Nama Anda (Kosongkan jika member lama)">
                 </div>
                 <div class="form-group text-left">
                     <label class="small font-weight-bold text-white-50">TANGGAL LAHIR</label>
-                    <input type="date" id="inputTgl" class="form-control">
+                    <input type="date" id="inputTgl" name="tgl_lahir" class="form-control">
                 </div>
                 <div class="form-group text-left">
                     <label class="small font-weight-bold text-white-50">PEKERJAAN</label>
-                    <input type="text" id="inputKerja" class="form-control" placeholder="Mahasiswa / Karyawan / Umum">
+                    <input type="text" id="inputKerja" name="pekerjaan" class="form-control" placeholder="Mahasiswa / Karyawan / Umum">
                 </div>
             </div>
 
