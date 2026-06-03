@@ -11,25 +11,27 @@
         body { font-family: 'Montserrat', sans-serif; background-color: #0d0d0d; color: #fff; }
         .main-container { max-width: 450px; margin: auto; padding: 20px; }
         
-        /* Desain Logo Kotak Utuh Tanpa Terpotong Lingkaran */
         .logo-main { width: 120px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
         .logo-img { width: 100%; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 0 15px rgba(211, 47, 47, 0.4); }
         
-        /* Tema Form & Voucher: Hitam dan Merah */
+        /* Tema Form & Voucher: Hitam-Merah Bold Khas Mie Judes */
         .card-promo { background: #1a1a1a; border-radius: 25px; color: #fff; padding: 25px; border: 2px solid #d32f2f; box-shadow: 0 0 20px rgba(211, 47, 47, 0.2); }
+        
+        /* Desain Tab Putih Bersih Sesuai Standar Baru */
+        .tab-container { display: flex; background: #f5f5f5; border-radius: 15px; padding: 5px; margin-bottom: 25px; }
+        .tab-btn { flex: 1; padding: 12px; font-size: 13px; font-weight: 800; border: none; border-radius: 12px; background: transparent; color: #333; transition: 0.3s; cursor: pointer; text-transform: uppercase; }
+        .tab-btn.active { background: #d32f2f; color: #fff; box-shadow: 0 4px 10px rgba(211,47,47,0.3); }
+        
         .form-control { border-radius: 10px; padding: 12px; font-size: 14px; background-color: #262626; border: 1px solid #404040; color: #fff; }
         .form-control:focus { background-color: #333; border-color: #d32f2f; color: #fff; box-shadow: none; }
         
-        /* Tombol Merah Menyala */
-        .btn-submit { background: #d32f2f; color: #fff; border-radius: 12px; font-weight: 800; padding: 15px; border: none; width: 100%; margin-top: 15px; transition: 0.3s; }
+        .btn-submit { background: #d32f2f; color: #fff; border-radius: 12px; font-weight: 800; padding: 15px; border: none; width: 100%; margin-top: 15px; transition: 0.3s; display: flex; align-items: center; justify-content: center; text-transform: uppercase; }
         .btn-submit:hover { background: #b71c1c; }
         
         #voucherSection { position: fixed; left: -9999px; top: 0; }
-        
-        /* Desain Voucher Hitam Merah */
         .v-box { background: #1a1a1a; width: 380px; color: #fff; border-radius: 20px; overflow: hidden; border: 4px solid #d32f2f; }
         .v-header { background: #d32f2f; color: #fff; padding: 20px; text-align: center; }
-        .v-body { padding: 25px; text-align: center; border-bottom: 2px dashed #d32f2f; position: relative; background: #222222; }
+        .v-body { padding: 35px 25px; text-align: center; border-bottom: 2px dashed #d32f2f; position: relative; background: #222222; }
         .v-footer { background: #1a1a1a; padding: 15px; text-align: center; font-size: 11px; }
         .v-cut { height: 30px; background: #0d0d0d; width: 30px; border-radius: 50%; position: absolute; bottom: -15px; z-index: 10; }
         .cut-left { left: -15px; border-right: 2px solid #d32f2f; } .cut-right { right: -15px; border-left: 2px solid #d32f2f; }
@@ -37,47 +39,60 @@
         #resultArea { display: none; text-align: center; margin-top: 20px; }
         #finalVoucher { max-width: 100%; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 2px solid #d32f2f; }
         .phone-badge { display: inline-block; background: #d32f2f; color: #fff; font-weight: bold; padding: 5px 15px; border-radius: 20px; font-size: 14px; margin-top: 2px; }
-        .info-status { font-size: 12px; font-weight: bold; margin-bottom: 15px; border-radius: 12px; background: #222; border: 1px solid #d32f2f; color: #fff; }
+        .info-status { font-size: 12px; font-weight: bold; margin-bottom: 15px; border-radius: 12px; background: #222; border: 1px solid #d32f2f; color: #fff; padding: 12px; }
+
+        .spinner { display: none; width: 20px; height: 20px; border: 3px solid #fff; border-radius: 50%; border-top-color: transparent; animation: spin 0.8s linear infinite; margin-left: 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="main-container text-center">
     <div class="logo-main">
+        <!-- Logo Asli Mie Judes -->
         <img src="https://lh3.googleusercontent.com/d/19THn9yAHSTHluA3t3ybClJWASbG0Blhx" class="logo-img" alt="Logo Mie Judes">
     </div>
 
     <div class="mb-4">
         <h2 class="font-weight-bold" style="color: #d32f2f; letter-spacing: 1px;">MEMBER PORTAL 🎉</h2>
-        <p class="small text-white-50">Daftar Member Baru / Cetak Kartu Member GO<br><b>Cukup Masukkan Nomor WhatsApp Anda!</b></p>
+        <p class="small text-white-50">Silakan pilih opsi di bawah untuk memproses Kartu Member Anda</p>
     </div>
 
     <div id="mainForm" class="card-promo shadow-lg">
+        <!-- Tab Pilihan -->
+        <div class="tab-container">
+            <button type="button" class="tab-btn" id="tabLama" onclick="switchTab('lama')">Sudah Member</button>
+            <button type="button" class="tab-btn active" id="tabBaru" onclick="switchTab('baru')">Belum Member</button>
+        </div>
+
         <form id="formKlaim">
             <input type="hidden" name="action" value="daftarMemberBaru">
             
             <div class="form-group text-left">
                 <label class="small font-weight-bold text-white-50">NOMOR WHATSAPP</label>
-                <input type="tel" id="inputHP" name="hp" class="form-control" placeholder="Contoh: 08123xxxx" required>
+                <input type="tel" id="inputHP" name="hp" class="form-control" placeholder="Contoh: 08123xxxx" required autocomplete="off">
             </div>
 
-            <!-- PERBAIKAN: Menambahkan atribut 'name' pada setiap input agar terbaca di Google Sheets -->
+            <!-- Bagian data tambahan tersembunyi jika pilih opsi Sudah Member -->
             <div id="formTambahan">
                 <div class="form-group text-left">
                     <label class="small font-weight-bold text-white-50">NAMA LENGKAP</label>
-                    <input type="text" id="inputNama" name="nama" class="form-control" placeholder="Nama Anda (Kosongkan jika member lama)">
+                    <input type="text" id="inputNama" name="nama" class="form-control" placeholder="Nama Lengkap Anda" required>
                 </div>
                 <div class="form-group text-left">
                     <label class="small font-weight-bold text-white-50">TANGGAL LAHIR</label>
-                    <input type="date" id="inputTgl" name="tgl_lahir" class="form-control">
+                    <input type="date" id="inputTgl" name="tgl_lahir" class="form-control" required>
                 </div>
                 <div class="form-group text-left">
                     <label class="small font-weight-bold text-white-50">PEKERJAAN</label>
-                    <input type="text" id="inputKerja" name="pekerjaan" class="form-control" placeholder="Mahasiswa / Karyawan / Umum">
+                    <input type="text" id="inputKerja" name="pekerjaan" class="form-control" placeholder="Mahasiswa / Karyawan / Umum" required>
                 </div>
             </div>
 
-            <button type="submit" id="btnSubmit" class="btn-submit shadow">PROSES KARTU MEMBER</button>
+            <button type="submit" id="btnSubmit" class="btn-submit shadow">
+                <span id="btnText">PROSES KARTU MEMBER</span>
+                <div id="spinner" class="spinner"></div>
+            </button>
         </form>
     </div>
 
@@ -85,13 +100,14 @@
         <div id="statusPesan" class="alert info-status"></div>
         <img id="finalVoucher" class="img-fluid">
         <div class="alert alert-danger mt-3 py-2 px-3 style-warning" style="border-radius: 15px; font-size: 12px; background: #222; border: 1px solid #d32f2f; color: #fff;">
-            <b>CARA SIMPAN:</b> Tekan lama pada gambar voucher di atas, lalu pilih <b>"Simpan Gambar"</b>.
+            <b>CARA SIMPAN:</b> Tekan lama pada gambar kartu di atas, lalu pilih <b>"Simpan Gambar"</b>.
         </div>
-        <p class="mt-4 small text-white-50">Tunjukkan voucher ini ke kasir Mie Judes saat bertransaksi.</p>
+        <p class="mt-4 small text-white-50">Tunjukkan kartu ini ke kasir Mie Judes setiap kali bertransaksi.</p>
         <button onclick="location.reload()" class="btn btn-sm btn-outline-danger mt-2">Kembali</button>
     </div>
 </div>
 
+<!-- Desain ID Card Permanen Mie Judes -->
 <div id="voucherSection">
     <div id="vCapture" class="v-box">
         <div class="v-header">
@@ -113,19 +129,60 @@
         </div>
         <div class="v-footer">
             <p class="mb-1 font-weight-bold">KODE MEMBER: <span id="resKode" style="color: #d32f2f;"></span></p>
-            <p class="mb-0 text-white font-weight-bold" id="resValid" style="font-size: 12px; text-transform: uppercase; border: 1px solid #d32f2f; display: inline-block; padding: 3px 15px; border-radius: 5px; background: #d32f2f; letter-spacing: 0.5px;"></p>
-            <p class="mb-0 text-white-50 mt-2" style="font-size: 8px;">*Tunjukkan voucher ini ke kasir untuk mempermudah proses transaksi</p>
+            <p class="mb-0 text-white font-weight-bold" id="resValid" style="font-size: 12px; text-transform: uppercase; border: 1px solid #d32f2f; display: inline-block; padding: 3px 15px; border-radius: 5px; background: #d32f2f; letter-spacing: 0.5px;">BERLAKU SELAMANYA</p>
+            <p class="mb-0 text-white-50 mt-2" style="font-size: 8px;">*Kumpulkan poin pembelian setiap kali berkunjung ke Mie Judes</p>
         </div>
     </div>
 </div>
 
 <script>
+    // PENTING: Gunakan Web App URL khusus database MIE JUDES Kakak
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxjxViMtbQSaD30Qt1GHaKS0wxanC92OBFqPGzVhiqws1GyhbwsFXS2LQBcKC1JlTMJ/exec';
+
+    const inputHP = document.getElementById('inputHP');
+    const inputNama = document.getElementById('inputNama');
+    const inputTgl = document.getElementById('inputTgl');
+    const inputKerja = document.getElementById('inputKerja');
+    const formTambahan = document.getElementById('formTambahan');
+    
+    let currentMode = 'baru';
+
+    function switchTab(mode) {
+        currentMode = mode;
+        document.getElementById('tabLama').classList.remove('active');
+        document.getElementById('tabBaru').classList.remove('active');
+        clearForm();
+
+        if (mode === 'lama') {
+            document.getElementById('tabLama').classList.add('active');
+            formTambahan.style.display = 'none'; // Sembunyikan kolom biodata
+            setInputsRequired(false);
+            inputHP.placeholder = "Masukkan nomor HP terdaftar Anda";
+        } else {
+            document.getElementById('tabBaru').classList.add('active');
+            formTambahan.style.display = 'block'; // Tampilkan kembali untuk member baru
+            setInputsRequired(true);
+            inputHP.placeholder = "Contoh: 08123xxxx";
+        }
+    }
+
+    function setInputsRequired(status) {
+        inputNama.required = status;
+        inputTgl.required = status;
+        inputKerja.required = status;
+    }
+
+    function clearForm() {
+        inputHP.value = ''; inputNama.value = ''; inputTgl.value = ''; inputKerja.value = '';
+    }
 
     document.getElementById('formKlaim').addEventListener('submit', e => {
         e.preventDefault();
+
+        document.getElementById('btnText').style.display = 'none';
+        document.getElementById('spinner').style.display = 'block';
         const btn = document.getElementById('btnSubmit');
-        btn.innerText = "Mengecek Database..."; btn.disabled = true;
+        btn.disabled = true;
 
         fetch(scriptURL, { method: 'POST', body: new FormData(e.target)})
         .then(res => res.json()).then(res => {
@@ -133,13 +190,13 @@
                 document.getElementById('resNama').innerText = res.nama.toUpperCase();
                 document.getElementById('resHP').innerText = res.hp;
                 document.getElementById('resKode').innerText = res.kode;
-                document.getElementById('resValid').innerText = res.valid;
                 
-                const statusBox = document.getElementById('statusPesan');
                 if(res.is_lama) {
-                    statusBox.innerText = "DATA MEMBER DITEMUKAN! KARTU ANDA BERHASIL DICETAK ULANG. ✅";
+                    document.getElementById('resValid').innerText = "MEMBER SETIA";
+                    document.getElementById('statusPesan').innerText = "DATA MEMBER DITEMUKAN! KARTU ANDA BERHASIL DICETAK ULANG. ✅";
                 } else {
-                    statusBox.innerText = "PENDAFTARAN BERHASIL! SELAMAT BERGABUNG. ✅";
+                    document.getElementById('resValid').innerText = "MEMBER BARU";
+                    document.getElementById('statusPesan').innerText = "PENDAFTARAN BERHASIL! SELAMAT BERGABUNG. ✅";
                 }
 
                 document.getElementById('mainForm').style.display = 'none';
@@ -148,16 +205,22 @@
                         document.getElementById('finalVoucher').src = canvas.toDataURL("image/png");
                         document.getElementById('resultArea').style.display = 'block';
                         window.scrollTo(0,0);
+                        document.getElementById('btnText').style.display = 'block';
+                        document.getElementById('spinner').style.display = 'none';
+                        btn.disabled = false;
                     });
                 }, 500);
             } else {
                 alert(res.message);
-                btn.innerText = "PROSES KARTU MEMBER"; btn.disabled = false;
+                document.getElementById('btnText').style.display = 'block';
+                document.getElementById('spinner').style.display = 'none';
+                btn.disabled = false;
             }
         }).catch(err => {
-            alert('Sistem sedang sibuk. Mohon coba lagi nanti.');
+            alert('Sistem sedang sibuk atau nomor belum terdaftar. Mohon periksa kembali.');
+            document.getElementById('btnText').style.display = 'block';
+            document.getElementById('spinner').style.display = 'none';
             btn.disabled = false;
-            btn.innerText = "PROSES KARTU MEMBER";
         });
     });
 </script>
