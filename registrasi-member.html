@@ -1,0 +1,191 @@
+/**
+ * CRM MIE JUDES - SCRIPT TERPADU OPERASIONAL HARIAN (MEMBER TETAP)
+ * Fitur: Registrasi/Cetak Ulang Pintar (Nama + No HP Masuk Voucher), Update Poin, Cek Member, 
+ * & Pengingat Otomatis dengan fitur Arsip Notifikasi (Update Kolom M)
+ */
+
+var NAMA_BRAND = "MIE JUDES";
+var TEKS_HADIAH = "\n🎁 *PROGRAM TUKAR POIN:* \n━━━━━━━━━━━━━━━\n🔹 15 Poin : Es Teh Manis 🥤\n🔹 20 Poin : Snack Sosis 🌭\n🔹 25 Poin : Dimsum Special 🥟\n🔹 30 Poin : Mie Kentir / Mie Judes 🍜\n";
+
+function doGet(e) {
+  if (e.parameter.action == 'getReminders') {
+    return ContentService.createTextOutput(JSON.stringify(getReminders())).setMimeType(ContentService.MimeType.JSON);
+  }
+  return HtmlService.createHtmlOutputFromFile('index');
+}
+
+function doPost(e) {
+  var action = e.parameter.action;
+  if (action == 'updateTransaksi') {
+    return ContentService.createTextOutput(JSON.stringify(updateTransaksi(e.parameter))).setMimeType(ContentService.MimeType.JSON);
+  } else if (action == 'claimVoucher') {
+    return ContentService.createTextOutput(JSON.stringify(claimVoucher(e.parameter))).setMimeType(ContentService.MimeType.JSON);
+  } else if (action == 'konfirmasiSapaan') {
+    return ContentService.createTextOutput(JSON.stringify(konfirmasiSapaan(e.parameter))).setMimeType(ContentService.MimeType.JSON);
+  } else {
+    return ContentService.createTextOutput(JSON.stringify(processForm(e.parameter))).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// ============================================================
+// FUNGSI UNTUK MENGHILANGKAN NOTIFIKASI (UPDATE KOLOM M)
+// ============================================================
+function konfirmasiSapaan(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var values = sheet.getDataRange().getValues();
+  var noHP = data.hp.toString().trim();
+  
+  for (var i = 1; i < values.length; i++) {
+    var currentHP = values[i][2].toString().replace("'", "").trim();
+    if (currentHP == noHP) {
+      // Update Kolom M (index 12) dengan tanggal saat ini
+      sheet.getRange(i + 1, 13).setValue(new Date());
+      return { success: true, message: "Notifikasi " + NAMA_BRAND + " diarsipkan." };
+    }
+  }
+  return { success: false };
+}
+
+// 1. PROSES PENDAFTARAN / CETAK ULANG MEMBER PINTAR (2-IN-1)
+function processForm(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var values = sheet.getDataRange().getValues();
+  var inputHP = data.hp.toString().trim();
+  
+  // LOGIKA BARU: Cek apakah nomor HP sudah terdaftar (Alumni Grand Opening / Member Lama)
+  for (var i = 1; i < values.length; i++) {
+    var existingHP = values[i][2].toString().replace("'", "").trim();
+    if (existingHP == inputHP) {
+      // Jika sudah terdaftar, langsung kirim data lama untuk dicetak ulang vouchernya tanpa dobel data
+      return { 
+        success: true, 
+        is_lama: true,
+        nama: values[i][1].toUpperCase(), 
+        hp: existingHP,
+        kode: values[i][10], // Mengambil Kode Voucher dari kolom K (index 10)
+        valid: "MEMBER OFFICIAL MIE JUDES 🎉" 
+      };
+    }
+  }
+
+  // Jika BELUM terdaftar, proses normal masukkan baris data baru ke Spreadsheet
+  var kode = "MJ-" + Math.random().toString(36).substr(2, 4).toUpperCase();
+  var p20 = data.p20 ? "YA" : "";
+  var p21 = data.p21 ? "YA" : "";
+  var p22 = data.p22 ? "YA" : "";
+  var p23 = data.p23 ? "YA" : "";
+  var p24 = data.p24 ? "YA" : "";
+
+  sheet.appendRow([
+    new Date(), 
+    data.nama.toUpperCase(), 
+    "'" + data.hp, 
+    data.tgl_lahir, 
+    data.pekerjaan, 
+    p20, p21, p22, p23, p24, // Kolom F-J
+    kode,                    // Kolom K (index 10)
+    0,                       // Kolom L (index 11) - Saldo Poin
+    new Date()              // Kolom M (index 12) - Update Terakhir
+  ]);
+  
+  return { 
+    success: true, 
+    is_lama: false,
+    nama: data.nama.toUpperCase(), 
+    hp: inputHP,
+    kode: kode, 
+    valid: "VOUCHER MEMBER BARU 🎉" 
+  };
+}
+
+// 2. FUNGSI UPDATE TRANSAKSI (TETAP SESUAI STRUKTUR IDEAL)
+function updateTransaksi(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var values = sheet.getDataRange().getValues();
+  var noHP = data.hp.toString().trim();
+  var waLink = noHP.startsWith('0') ? '62' + noHP.slice(1) : noHP;
+
+  var nominal = parseFloat(data.nominal);
+  var poinBaru = Math.floor(nominal / 10000); 
+  
+  for (var i = 1; i < values.length; i++) {
+    if (values[i][2] == noHP || values[i][2] == "'" + noHP) {
+      var poinLama = Number(values[i][11]) || 0; 
+      var totalPoin = poinLama + poinBaru;
+      
+      sheet.getRange(i + 1, 12).setValue(totalPoin); // Update Kolom L
+      sheet.getRange(i + 1, 13).setValue(new Date()); // Update Kolom M
+      
+      var pesanWA = "*STRUK POIN MIE JUDES*\n━━━━━━━━━━━━━━━\nTerima kasih Kak *" + values[i][1] + "*, kunjungan Kakak sangat berarti bagi kami! 🙏\n\n📝 *INFO POIN:*\n• Belanja: Rp " + nominal.toLocaleString('id-ID') + "\n• Poin Baru: +" + poinBaru + "\n\n💰 *TOTAL SALDO: " + totalPoin + " POIN*\n━━━━━━━━━━━━━━━" + TEKS_HADIAH + "\nKumpulkan terus poinnya dan nikmati menu favorit GRATIS! 🔥";
+      
+      return { success: true, nama: values[i][1], wa: waLink, pesan: pesanWA, totalPoin: totalPoin };
+    }
+  }
+  return { success: false, message: "Nomor Member tidak terdaftar!" };
+}
+
+// 3. FUNGSI CEK MEMBER (TETAP SESUAI STRUKTUR IDEAL)
+function claimVoucher(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var values = sheet.getDataRange().getValues();
+  var kodeInput = data.kode_voucher.toUpperCase().trim();
+  
+  for (var i = 1; i < values.length; i++) {
+    if (values[i][10] == kodeInput) { 
+      return { success: true, nama: values[i][1], pekerjaan: values[i][4], poin: values[i][11], message: "KODE VALID!" };
+    }
+  }
+  return { success: false, message: "KODE TIDAK DITEMUKAN!" };
+}
+
+// 4. FUNGSI PENGINGAT OTOMATIS (LOGIKA AUTO-HIDE BERDASARKAN KOLOM M)
+function getReminders() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheets()[0];
+  var data = sheet.getDataRange().getValues();
+  var today = new Date();
+  var besok = new Date(); besok.setDate(today.getDate() + 1);
+  var reminders = [];
+  
+  var todayStr = Utilities.formatDate(today, "GMT+7", "yyyy-MM-dd");
+  
+  for (var i = 1; i < data.length; i++) {
+    var rawWA = data[i][2].toString().trim().replace("'", "");
+    var waLink = rawWA.startsWith('0') ? '62' + rawWA.slice(1) : rawWA;
+    var tglLahir = new Date(data[i][3]);
+    var tglUpdateTerakhir = new Date(data[i][12]); // Kolom M (Index 12)
+    var lastUpdateStr = Utilities.formatDate(tglUpdateTerakhir, "GMT+7", "yyyy-MM-dd");
+
+    // Sapaan Hari-H Ultah (Hide jika sudah disapa hari ini)
+    if (tglLahir.getDate() == today.getDate() && tglLahir.getMonth() == today.getMonth() && lastUpdateStr !== todayStr) {
+      reminders.push({
+        tipe: "ULTAH HARI INI! 🎉",
+        nama: data[i][1], hp: rawWA, wa: waLink,
+        pesan: "*HAPPY BIRTHDAY KAK " + data[i][1].toUpperCase() + "!* 🎂🥳 Di hari spesial ini, Kakak berhak mengklaim *KADO MIE GRATIS* dari Mie Judes. Yuk mampir hari ini dan tunjukkan pesan ini ke kasir ya! ✨"
+      });
+    }
+    // Sapaan H-1 Ultah (Hide jika sudah disapa hari ini)
+    else if (tglLahir.getDate() == besok.getDate() && tglLahir.getMonth() == besok.getMonth() && lastUpdateStr !== todayStr) {
+      reminders.push({
+        tipe: "ULTAH BESOK! 🎁",
+        nama: data[i][1], hp: rawWA, wa: waLink,
+        pesan: "Halo Kak " + data[i][1] + ", besok Kakak ulang tahun ya? 😍 Spesial buat besok ada *Kado Mie Gratis* dari Mie Judes buat Kakak. Sampai jumpa besok di outlet ya! ✨"
+      });
+    }
+
+    // Pengingat 10 Hari (Auto-hide jika update terakhir < 10 hari yang lalu)
+    var selisihHari = Math.floor((today - tglUpdateTerakhir) / (1000 * 60 * 60 * 24));
+    if (selisihHari >= 10) {
+      reminders.push({
+        tipe: "RETENSI 🍜",
+        nama: data[i][1], hp: rawWA, wa: waLink,
+        pesan: "*KAMI RINDU KAKAK: MIE JUDES* 🥺\n━━━━━━━━━━━━━━━\nHalo Kak " + data[i][1] + ", sudah 10 hari nih nggak mampir ke Mie Judes. Poin Kakak saat ini: *" + data[i][11] + " POIN*.\n" + TEKS_HADIAH + "\nMampir yuk Kak, kami tunggu kehadirannya! 🔥"
+      });
+    }
+  }
+  return reminders;
+}
